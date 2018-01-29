@@ -7,6 +7,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -113,7 +114,7 @@ public class NoteAdapter extends RecyclerViewEmptySupport.Adapter<NoteAdapter.Vi
         TextView tvNoteExcerpt = holder.tvNoteExcerpt;
         TextView tvNoteDatetime = holder.tvNoteDatetime;
 
-        if(!mNotes.isEmpty()) {
+        if(mNotes!= null && !mNotes.isEmpty()) {
             Note note = mNotes.get(position);
 
             tvNoteTitle.setText(note.getTitle());
@@ -121,16 +122,25 @@ public class NoteAdapter extends RecyclerViewEmptySupport.Adapter<NoteAdapter.Vi
             tvNoteDatetime.setText(String.valueOf(note.getDatetime()));
         }else{
 
-            String noteTitle = mCursor.getString(mCursor.getColumnIndexOrThrow(NoteContract.NotesEntry.COLUMN_NOTE_TITLE));
-            String noteBody = mCursor.getString(mCursor.getColumnIndexOrThrow(NoteContract.NotesEntry.COLUMN_NOTE_BODY));
-            String noteTime = String.valueOf(mCursor.getLong(mCursor.getColumnIndexOrThrow(NoteContract.NotesEntry.COLUMN_NOTE_DATETIME)));
+            if(mCursor!=null) {
 
-            if(TextUtils.isEmpty(noteTitle)){
-                noteTitle="";
+                mCursor.moveToPosition(position);
+
+                int testid = mCursor.getColumnIndex(NoteContract.NotesEntry.COLUMN_NOTE_TITLE);
+
+
+                Log.i(this.getClass().getSimpleName(), "onBindViewHolder: "+mCursor.getCount());
+                String noteTitle = mCursor.getString(testid);
+                String noteBody = mCursor.getString(mCursor.getColumnIndex(NoteContract.NotesEntry.COLUMN_NOTE_BODY));
+                String noteTime = String.valueOf(mCursor.getLong(mCursor.getColumnIndex(NoteContract.NotesEntry.COLUMN_NOTE_DATETIME)));
+
+                if (TextUtils.isEmpty(noteTitle)) {
+                    noteTitle = "";
+                }
+                tvNoteTitle.setText(noteTitle);
+                tvNoteExcerpt.setText(noteBody);
+                tvNoteDatetime.setText(String.valueOf(noteTime));
             }
-            tvNoteTitle.setText(noteTitle);
-            tvNoteExcerpt.setText(noteBody);
-            tvNoteDatetime.setText(String.valueOf(noteTime));
         }
 
     }

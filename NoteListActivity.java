@@ -56,35 +56,13 @@ public class NoteListActivity extends AppCompatActivity implements LoaderManager
         });
 
 
-//        // Adapter biasa
-//        notes = new ArrayList<Note>();
-//        //generateDummyNotes();
-//
-//        noteAdapter = new NoteAdapter(this, notes);
-//        noteAdapter.setOnItemClickListener(new NoteAdapter.OnItemClickListener() {
-//            @Override
-//            public void OnItemClick(View itemView, int posittion) {
-//                // Responsive Toast
-//                if (mToast != null) {
-//                    mToast.cancel();
-//                }
-//                mToast = Toast.makeText(NoteListActivity.this, "Clicked " + notes.get(posittion).toString(), Toast.LENGTH_SHORT);
-//                mToast.show();
-//
-//                // To EditorActivity
-//                Intent intent = new Intent(NoteListActivity.this, EditorActivity.class);
-//                startActivity(intent);
-//
-//            }
-//        });
-
         noteCursorAdapter = new NoteCursorAdapter(this,null);
 
         noteAdapter = new NoteAdapter(NoteListActivity.this, mCursor);
 
 
 
-        RecyclerViewEmptySupport rvNoteList = findViewById(R.id.rv_list_note);
+        RecyclerViewEmptySupport rvNoteList = findViewById(R.id.rv_note_list);
         rvNoteList.setAdapter(noteAdapter);
         rvNoteList.setLayoutManager(new LinearLayoutManager(this));
         rvNoteList.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
@@ -111,8 +89,7 @@ public class NoteListActivity extends AppCompatActivity implements LoaderManager
         //noinspection SimplifiableIfStatement
         switch (id) {
             case R.id.action_delete_all:
-                notes.clear();
-                noteAdapter.notifyDataSetChanged();
+                int rowsDeleted = getContentResolver().delete(NoteContract.NotesEntry.CONTENT_URI,null,null);
 
                 return true;
             case R.id.action_insert:
@@ -145,16 +122,18 @@ public class NoteListActivity extends AppCompatActivity implements LoaderManager
 
     private void generateOneDummyNoteDB(){
 
-        int randomTitleNum = (int) Math.floor(Math.random()*100);
-        int randomBodyNum = (int) Math.floor(Math.random()*1000);
+        for(int i=0;i<100;i++) {
 
-        ContentValues values = new ContentValues();
-        values.put(NoteContract.NotesEntry.COLUMN_NOTE_TITLE, "Judul"+randomTitleNum);
-        values.put(NoteContract.NotesEntry.COLUMN_NOTE_BODY, randomBodyNum+". Lorem ipsum dolor sit amet");
-        values.put(NoteContract.NotesEntry.COLUMN_NOTE_DATETIME, new Date().getTime());
-        Uri newUri = getContentResolver().insert(NoteContract.NotesEntry.CONTENT_URI, values);
-        Log.i(this.getClass().getSimpleName(), "generateOneDummyNoteDB: "+values.toString());
+            int randomTitleNum = (int) Math.floor(Math.random() * 100);
+            int randomBodyNum = (int) Math.floor(Math.random() * 1000);
 
+            ContentValues values = new ContentValues();
+            values.put(NoteContract.NotesEntry.COLUMN_NOTE_TITLE, "Judul" + randomTitleNum);
+            values.put(NoteContract.NotesEntry.COLUMN_NOTE_BODY, randomBodyNum + ". Lorem ipsum dolor sit amet");
+            values.put(NoteContract.NotesEntry.COLUMN_NOTE_DATETIME, new Date().getTime());
+            Uri newUri = getContentResolver().insert(NoteContract.NotesEntry.CONTENT_URI, values);
+            Log.i(this.getClass().getSimpleName(), "generateOneDummyNoteDB: " + values.toString());
+        }
 
 
     }
@@ -183,7 +162,8 @@ public class NoteListActivity extends AppCompatActivity implements LoaderManager
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
-        noteAdapter.swapCursor(mCursor);
+        noteAdapter.swapCursor(cursor);
+        noteAdapter.notifyDataSetChanged();
     }
 
     @Override
