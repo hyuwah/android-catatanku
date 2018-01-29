@@ -9,6 +9,9 @@ import android.view.ViewGroup;
 import android.widget.CursorAdapter;
 import android.widget.TextView;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import io.github.hyuwah.catatanku.R;
 import io.github.hyuwah.catatanku.storage.NoteContract;
 
@@ -29,13 +32,19 @@ public class NoteCursorAdapter extends CursorAdapter {
 
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
-        TextView tvTitle = (TextView) view.findViewById(R.id.note_title);
-        TextView tvBody = (TextView) view.findViewById(R.id.note_excerpt);
-        TextView tvDatetime = (TextView) view.findViewById(R.id.note_time);
+        TextView tvTitle =  view.findViewById(R.id.note_title);
+        TextView tvBody =  view.findViewById(R.id.note_excerpt);
+        TextView tvDatetime = view.findViewById(R.id.note_time);
+
+        // Just show excerpt of note body
+        tvBody.setMaxLines(3);
+        tvBody.setEllipsize(TextUtils.TruncateAt.END);
 
         String noteTitle = cursor.getString(cursor.getColumnIndexOrThrow(NoteContract.NotesEntry.COLUMN_NOTE_TITLE));
         String noteBody = cursor.getString(cursor.getColumnIndexOrThrow(NoteContract.NotesEntry.COLUMN_NOTE_BODY));
-        String noteTime = String.valueOf(cursor.getLong(cursor.getColumnIndexOrThrow(NoteContract.NotesEntry.COLUMN_NOTE_DATETIME)));
+
+        Date utcTime = new Date(cursor.getLong(cursor.getColumnIndexOrThrow(NoteContract.NotesEntry.COLUMN_NOTE_DATETIME)));
+        String noteTime = new SimpleDateFormat("EEEE, dd MMM yyyy\nHH:mm:ss").format(utcTime);
 
         if(TextUtils.isEmpty(noteTitle)){
             noteTitle="";
