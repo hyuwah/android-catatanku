@@ -16,6 +16,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -58,14 +59,12 @@ public class NoteListActivity extends AppCompatActivity implements LoaderManager
 
         noteCursorAdapter = new NoteCursorAdapter(this,null);
 
-        noteAdapter = new NoteAdapter(NoteListActivity.this, mCursor);
+//        noteAdapter = new NoteAdapter(NoteListActivity.this, mCursor);
 
 
 
-        RecyclerViewEmptySupport rvNoteList = findViewById(R.id.rv_note_list);
-        rvNoteList.setAdapter(noteAdapter);
-        rvNoteList.setLayoutManager(new LinearLayoutManager(this));
-        rvNoteList.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
+        ListView rvNoteList = (ListView) findViewById(R.id.lv_note_list);
+        rvNoteList.setAdapter(noteCursorAdapter);
         rvNoteList.setEmptyView(findViewById(R.id.empty_note_list_view));
 
         getLoaderManager().initLoader(NOTE_LOADER,null,this);
@@ -162,12 +161,11 @@ public class NoteListActivity extends AppCompatActivity implements LoaderManager
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
-        noteAdapter.swapCursor(cursor);
-        noteAdapter.notifyDataSetChanged();
+        noteCursorAdapter.swapCursor(cursor);
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-        noteAdapter.swapCursor(null);
+        noteCursorAdapter.swapCursor(null);
     }
 }
