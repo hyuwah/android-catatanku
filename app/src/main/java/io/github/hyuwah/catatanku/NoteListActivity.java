@@ -15,16 +15,12 @@ import android.support.customtabs.CustomTabsIntent;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.DividerItemDecoration;
-import android.support.v7.widget.LinearLayoutManager;
 import android.util.Log;
-import android.util.SparseBooleanArray;
 import android.view.ActionMode;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.AbsListView;
-import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -34,10 +30,7 @@ import java.util.Date;
 import butterknife.BindColor;
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import io.github.hyuwah.catatanku.CustomView.RecyclerViewEmptySupport;
-import io.github.hyuwah.catatanku.adapter.NoteAdapter;
 import io.github.hyuwah.catatanku.adapter.NoteCursorAdapter;
-import io.github.hyuwah.catatanku.model.Note;
 import io.github.hyuwah.catatanku.storage.NoteContract;
 
 public class NoteListActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
@@ -56,8 +49,6 @@ public class NoteListActivity extends AppCompatActivity implements LoaderManager
     @BindColor(R.color.black)
     int color_black;
 
-    private ArrayList<Note> notes;
-    private NoteAdapter noteAdapter;
     private Toast mToast;
 
     private int dummyDataCount = 10;
@@ -222,18 +213,6 @@ public class NoteListActivity extends AppCompatActivity implements LoaderManager
     /**
      * Dummy notes data
      */
-
-    private void generateDummyNotes() {
-        for (int i = 0; i < 10; i++) {
-            notes.add(new Note("Judul", "Lorem ipsum dolor sit amet", 1516958785));
-        }
-    }
-
-    private void generateOneDummyNote() {
-        notes.add(Note.dbg_addItem());
-        noteAdapter.notifyDataSetChanged();
-        Log.i(NoteListActivity.class.getSimpleName(), "Notes added : " + notes.toString());
-    }
 
     private void generateOneDummyNoteDB() {
 
