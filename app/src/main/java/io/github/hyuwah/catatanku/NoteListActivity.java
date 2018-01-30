@@ -1,22 +1,29 @@
 package io.github.hyuwah.catatanku;
 
+import android.app.AlertDialog;
 import android.app.LoaderManager;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.CursorLoader;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.customtabs.CustomTabsIntent;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.util.Log;
+import android.util.SparseBooleanArray;
+import android.view.ActionMode;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -24,6 +31,9 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.Date;
 
+import butterknife.BindColor;
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import io.github.hyuwah.catatanku.CustomView.RecyclerViewEmptySupport;
 import io.github.hyuwah.catatanku.adapter.NoteAdapter;
 import io.github.hyuwah.catatanku.adapter.NoteCursorAdapter;
@@ -31,6 +41,20 @@ import io.github.hyuwah.catatanku.model.Note;
 import io.github.hyuwah.catatanku.storage.NoteContract;
 
 public class NoteListActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
+
+    // Views
+    @BindView(R.id.fab)
+    FloatingActionButton fab;
+    @BindView(R.id.lv_note_list)
+    ListView lvNoteList;
+    @BindView(R.id.empty_note_list_view)
+    View lvEmptyNoteList;
+
+
+    @BindColor(R.color.white)
+    int color_white;
+    @BindColor(R.color.black)
+    int color_black;
 
     private ArrayList<Note> notes;
     private NoteAdapter noteAdapter;
@@ -41,49 +65,102 @@ public class NoteListActivity extends AppCompatActivity implements LoaderManager
     // Storage
     private static final int NOTE_LOADER = 0;
     NoteCursorAdapter noteCursorAdapter;
-    Cursor mCursor;
 
+    /**
+     * Lifecycle Override
+     */
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_note_list);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+        ButterKnife.bind(this);
 
-                Intent intent = new Intent(NoteListActivity.this, EditorActivity.class);
-                startActivity(intent);
-
-            }
+        fab.setOnClickListener(view -> {
+            Intent intent = new Intent(NoteListActivity.this, EditorActivity.class);
+            startActivity(intent);
         });
 
 
         noteCursorAdapter = new NoteCursorAdapter(this, null);
-
         // noteAdapter = new NoteAdapter(NoteListActivity.this, mCursor);
 
-        ListView lvNoteList = (ListView) findViewById(R.id.lv_note_list);
         lvNoteList.setAdapter(noteCursorAdapter);
-        lvNoteList.setEmptyView(findViewById(R.id.empty_note_list_view));
+        lvNoteList.setEmptyView(lvEmptyNoteList);
 
-
-        lvNoteList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        // Multi select listview
+        lvNoteList.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
+        lvNoteList.setMultiChoiceModeListener(new AbsListView.MultiChoiceModeListener() {
             @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-
-                Intent intent = new Intent(NoteListActivity.this, EditorActivity.class);
-                Uri currentNoteUri = ContentUris.withAppendedId(NoteContract.NotesEntry.CONTENT_URI, l);
-                intent.setData(currentNoteUri);
-                startActivity(intent);
+            public void onItemCheckedStateChanged(ActionMode actionMode, int i, long l, boolean b) {
+                final int checkedCount = lvNoteList.getCheckedItemCount();
+                actionMode.setTitle(checkedCount + " Selected");
+                noteCursorAdapter.toggleSelection(i);
             }
+
+            @Override
+            public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
+                actionMode.getMenuInflater().inflate(R.menu.menu_note_list_onselect, menu);
+                return true;
+            }
+
+            @Override
+            public boolean onPrepareActionMode(ActionMode actionMode, Menu menu) {
+                return false;
+            }
+
+            @Override
+            public boolean onActionItemClicked(ActionMode actionMode, MenuItem menuItem) {
+
+                switch (menuItem.getItemId()) {
+
+                    case R.id.onselect_select_all:
+                        Toast.makeText(NoteListActivity.this, "select all", Toast.LENGTH_SHORT).show();
+                        return true;
+                    case R.id.onselect_delete:
+                        //Toast.makeText(NoteListActivity.this, noteCursorAdapter.getSelectedIds() + " delete" + noteCursorAdapter.getSelectedCount(), Toast.LENGTH_SHORT).show();
+
+                        //TODO dialog confirmation delete
+                        showDeleteConfirmationDialog((dialogInterface, i) -> {
+                            for (int x = 0; x < noteCursorAdapter.getSelectedCount(); x++) {
+                                int listId = noteCursorAdapter.getSelectedIds().keyAt(x);
+                                long realId = noteCursorAdapter.getItemId(listId);
+                                Log.i(this.getClass().getSimpleName(), "Selected: list id=" + listId+", db_id="+realId);
+                                int rowsDeleted = getContentResolver().delete(ContentUris.withAppendedId(NoteContract.NotesEntry.CONTENT_URI, realId), null, null);
+                                Log.i(this.getClass().getSimpleName(), "onActionItemClicked: rowsDeleted=" + rowsDeleted);
+
+                            }
+                            Toast.makeText(NoteListActivity.this, "Deleted "+noteCursorAdapter.getSelectedCount()+" notes", Toast.LENGTH_SHORT).show();
+                            noteCursorAdapter.removeSelection();
+                            actionMode.finish();
+                        });
+                        return true;
+                    default:
+                        return false;
+
+                }
+            }
+
+            @Override
+            public void onDestroyActionMode(ActionMode actionMode) {
+            }
+        });
+
+        lvNoteList.setOnItemClickListener((adapterView, view, position, id) -> {
+            Intent intent = new Intent(NoteListActivity.this, EditorActivity.class);
+            Uri currentNoteUri = ContentUris.withAppendedId(NoteContract.NotesEntry.CONTENT_URI, id);
+            intent.setData(currentNoteUri);
+            startActivity(intent);
         });
 
         getLoaderManager().initLoader(NOTE_LOADER, null, this);
 
     }
+
+    /**
+     * Overflow Menu Related
+     */
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
@@ -115,8 +192,24 @@ public class NoteListActivity extends AppCompatActivity implements LoaderManager
 
                 return true;
             case R.id.action_insert:
-            //  generateOneDummyNote();
+                //  generateOneDummyNote();
                 generateOneDummyNoteDB();
+                return true;
+
+            case R.id.action_gitbook_journal:
+
+                // Use a CustomTabsIntent.Builder to configure CustomTabsIntent.
+                String url = "https://hyuwah.gitbooks.io/journal-refactory/content/";
+                CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
+                builder.setToolbarColor(ContextCompat.getColor(this, R.color.colorAccent));
+                // add share action to menu list
+                builder.addDefaultShareMenuItem();
+                // set toolbar color and/or setting custom actions before invoking build()
+                // Once ready, call CustomTabsIntent.Builder.build() to create a CustomTabsIntent
+                CustomTabsIntent customTabsIntent = builder.build();
+                // and launch the desired Url with CustomTabsIntent.launchUrl()
+                customTabsIntent.launchUrl(this, Uri.parse(url));
+
                 return true;
 
             default:
@@ -129,6 +222,7 @@ public class NoteListActivity extends AppCompatActivity implements LoaderManager
     /**
      * Dummy notes data
      */
+
     private void generateDummyNotes() {
         for (int i = 0; i < 10; i++) {
             notes.add(new Note("Judul", "Lorem ipsum dolor sit amet", 1516958785));
@@ -187,4 +281,21 @@ public class NoteListActivity extends AppCompatActivity implements LoaderManager
     public void onLoaderReset(Loader<Cursor> loader) {
         noteCursorAdapter.swapCursor(null);
     }
+
+    /**
+     *  Activity Methods
+     */
+
+    private void showDeleteConfirmationDialog(DialogInterface.OnClickListener deleteClickListener) {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Selected notes will be deleted!")
+                .setPositiveButton("Cancel", (dialogInterface, i) -> {
+                    if (dialogInterface != null) {
+                        dialogInterface.dismiss();
+                    }
+                })
+                .setNegativeButton("Delete", deleteClickListener).show();
+    }
+
 }

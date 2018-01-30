@@ -3,6 +3,7 @@ package io.github.hyuwah.catatanku.adapter;
 import android.content.Context;
 import android.database.Cursor;
 import android.text.TextUtils;
+import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +13,9 @@ import android.widget.TextView;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import butterknife.BindColor;
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import io.github.hyuwah.catatanku.R;
 import io.github.hyuwah.catatanku.storage.NoteContract;
 
@@ -21,8 +25,15 @@ import io.github.hyuwah.catatanku.storage.NoteContract;
 
 public class NoteCursorAdapter extends CursorAdapter {
 
+    @BindView(R.id.note_title) TextView tvTitle;
+    @BindView(R.id.note_excerpt) TextView tvBody;
+    @BindView(R.id.note_time) TextView tvDatetime;
+
+    private SparseBooleanArray mSelectedItemsIds;
+
     public NoteCursorAdapter(Context context, Cursor c) {
         super(context, c, 0);
+        mSelectedItemsIds = new SparseBooleanArray();
     }
 
     @Override
@@ -32,9 +43,12 @@ public class NoteCursorAdapter extends CursorAdapter {
 
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
-        TextView tvTitle =  view.findViewById(R.id.note_title);
-        TextView tvBody =  view.findViewById(R.id.note_excerpt);
-        TextView tvDatetime = view.findViewById(R.id.note_time);
+
+        ButterKnife.bind(this,view);
+
+        // Truncate title if too long
+        tvTitle.setMaxLines(3);
+        tvTitle.setEllipsize(TextUtils.TruncateAt.END);
 
         // Just show excerpt of note body
         tvBody.setMaxLines(3);
@@ -54,4 +68,40 @@ public class NoteCursorAdapter extends CursorAdapter {
         tvBody.setText(noteBody);
         tvDatetime.setText(noteTime);
     }
+
+
+    /**
+     * Selection on ListView
+     */
+    public void  toggleSelection(int position) {
+        selectView(position, !mSelectedItemsIds.get(position));
+    }
+
+    // Remove selection after unchecked
+    public void  removeSelection() {
+        mSelectedItemsIds = new  SparseBooleanArray();
+        notifyDataSetChanged();
+    }
+
+    // Item checked on selection
+    public void selectView(int position, boolean value) {
+        if (value) {
+            mSelectedItemsIds.put(position, value);
+        }
+        else{
+            mSelectedItemsIds.delete(position);
+        }
+        notifyDataSetChanged();
+    }
+
+    // Get number of selected item
+    public int  getSelectedCount() {
+        return mSelectedItemsIds.size();
+    }
+
+    public  SparseBooleanArray getSelectedIds() {
+        return mSelectedItemsIds;
+    }
+
+
 }

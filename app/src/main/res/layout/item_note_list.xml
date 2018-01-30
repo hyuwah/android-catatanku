@@ -8,7 +8,8 @@
     android:paddingBottom="8dp"
     android:paddingLeft="16dp"
     android:paddingRight="16dp"
-    android:foreground="?android:attr/selectableItemBackground">
+    android:background="@drawable/note_list_activated"
+    >
 
     <TextView
         android:id="@+id/note_time"
@@ -26,6 +27,7 @@
         android:textAppearance="?android:textAppearanceLarge"
         android:paddingBottom="8dp"
         tools:text="Judul Catatan"
+        android:textColor="@drawable/note_list_text_color"
         />
 
     <TextView
@@ -33,7 +35,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textAppearance="?android:textAppearanceMedium"
-        android:textColor="#333"
+        android:textColor="@drawable/note_list_text_color"
         tools:text="Lorem Ipsum dolor sit amet ..." />
 
 

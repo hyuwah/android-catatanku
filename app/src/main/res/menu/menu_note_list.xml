@@ -13,4 +13,10 @@
         android:orderInCategory="101"
         android:title="@string/action_delete_all"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/action_gitbook_journal"
+        android:orderInCategory="102"
+        android:title="Gitbook Journal"
+        app:showAsAction="ifRoom"/>
+
 </menu>

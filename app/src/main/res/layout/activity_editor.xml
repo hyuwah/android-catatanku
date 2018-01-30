@@ -23,7 +23,7 @@
             android:layout_marginTop="8dp"
             android:background="@android:color/transparent"
             android:hint="Title"
-            android:inputType="text|textAutoCorrect"
+            android:inputType="textAutoCorrect|textShortMessage"
             android:textAppearance="@style/TextAppearance.AppCompat.Title" />
 
         <EditText

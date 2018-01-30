@@ -28,28 +28,31 @@ import android.widget.Toast;
 import java.io.IOException;
 import java.util.Date;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnTouch;
 import io.github.hyuwah.catatanku.storage.NoteContract;
 
 public class EditorActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
-    private EditText etTitle;
-    private EditText etBody;
+    //Views
+    @BindView(R.id.editor_note_title) EditText etTitle;
+    @BindView(R.id.editor_note_body) EditText etBody;
 
     private String currentTitle;
     private String currentBody;
+    private boolean hasChanged;
 
     private Uri mCurrentNote;
-    private boolean hasChanged;
 
     final String TAG = this.getClass().getSimpleName();
 
-    private View.OnTouchListener isChangedListener = new View.OnTouchListener() {
-        @Override
-        public boolean onTouch(View view, MotionEvent motionEvent) {
-            hasChanged = true;
-            return false;
-        }
-    };
+
+    @OnTouch({R.id.editor_note_title,R.id.editor_note_body})
+    public boolean setHasChanged(){
+        hasChanged = true;
+        return false;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,20 +75,15 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
 
     private void setupView() {
 
-        etTitle = (EditText) findViewById(R.id.editor_note_title);
-        etBody = (EditText) findViewById(R.id.editor_note_body);
+        ButterKnife.bind(this);
 
         etTitle.setImeOptions(EditorInfo.IME_ACTION_NEXT);
-        etTitle.setRawInputType(InputType.TYPE_TEXT_FLAG_IME_MULTI_LINE);
         etTitle.setHorizontallyScrolling(false);
         etTitle.setMaxLines(5);
 
-        etTitle.setOnTouchListener(isChangedListener);
-        etBody.setOnTouchListener(isChangedListener);
 
         currentTitle = "";
         currentBody = "";
-
 
     }
 
@@ -184,7 +182,6 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
             });
         }
 
-
     }
 
 
@@ -238,7 +235,6 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
             etBody.setText("");
             Toast.makeText(this, "Editor cleared", Toast.LENGTH_SHORT).show();
         }
-
 
     }
 
