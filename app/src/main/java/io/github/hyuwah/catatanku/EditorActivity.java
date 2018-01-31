@@ -47,12 +47,9 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
 
     final String TAG = this.getClass().getSimpleName();
 
-
-    @OnTouch({R.id.editor_note_title,R.id.editor_note_body})
-    public boolean setHasChanged(){
-        hasChanged = true;
-        return false;
-    }
+    /**
+     *  Lifecycle Override
+     */
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,22 +70,8 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         hasChanged = false;
     }
 
-    private void setupView() {
-
-        ButterKnife.bind(this);
-
-        etTitle.setImeOptions(EditorInfo.IME_ACTION_NEXT);
-        etTitle.setHorizontallyScrolling(false);
-        etTitle.setMaxLines(5);
-
-
-        currentTitle = "";
-        currentBody = "";
-
-    }
-
     /**
-     * Menu
+     * Overflow menu related
      */
 
     @Override
@@ -220,6 +203,25 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
     /**
      * Activity Methods
      */
+
+    @OnTouch({R.id.editor_note_title,R.id.editor_note_body})
+    public boolean setHasChanged(){
+        hasChanged = true;
+        return false;
+    }
+
+    private void setupView() {
+
+        ButterKnife.bind(this);
+
+        etTitle.setImeOptions(EditorInfo.IME_ACTION_NEXT);
+        etTitle.setHorizontallyScrolling(false);
+        etTitle.setMaxLines(5);
+
+        currentTitle = "";
+        currentBody = "";
+
+    }
 
     private void clearEditor() {
 

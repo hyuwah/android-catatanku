@@ -54,6 +54,7 @@ public class NoteCursorAdapter extends CursorAdapter {
         tvBody.setMaxLines(3);
         tvBody.setEllipsize(TextUtils.TruncateAt.END);
 
+        // Get data from cursor
         String noteTitle = cursor.getString(cursor.getColumnIndexOrThrow(NoteContract.NotesEntry.COLUMN_NOTE_TITLE));
         String noteBody = cursor.getString(cursor.getColumnIndexOrThrow(NoteContract.NotesEntry.COLUMN_NOTE_BODY));
 
