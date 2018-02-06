@@ -23,9 +23,11 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import butterknife.BindView;
@@ -38,9 +40,11 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
     //Views
     @BindView(R.id.editor_note_title) EditText etTitle;
     @BindView(R.id.editor_note_body) EditText etBody;
+    @BindView(R.id.editor_note_datetime) TextView tvDatetime;
 
     private String currentTitle;
     private String currentBody;
+    private Date currentDatetime;
     private boolean hasChanged;
 
     private Uri mCurrentNote;
@@ -55,17 +59,20 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_editor);
+        setupView();
 
         mCurrentNote = getIntent().getData();
 
         if (mCurrentNote == null) {
             setTitle("Add new note");
+            tvDatetime.setVisibility(View.GONE);
         } else {
             setTitle("Edit note");
+            tvDatetime.setVisibility(View.VISIBLE);
             getLoaderManager().initLoader(1, null, this);
         }
 
-        setupView();
+
 
         hasChanged = false;
     }
@@ -188,8 +195,12 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         if (cursor.moveToFirst()) {
             currentTitle = cursor.getString(cursor.getColumnIndex(NoteContract.NotesEntry.COLUMN_NOTE_TITLE));
             currentBody = cursor.getString(cursor.getColumnIndex(NoteContract.NotesEntry.COLUMN_NOTE_BODY));
+            currentDatetime = new Date(cursor.getLong(cursor.getColumnIndex(NoteContract.NotesEntry.COLUMN_NOTE_DATETIME)));
+            String currentDatetimeString = new SimpleDateFormat("HH:mm:ss - EEEE, dd MMM yyyy").format(currentDatetime);
+
             etTitle.setText(currentTitle);
             etBody.setText(currentBody);
+            tvDatetime.setText("Created at ➞ " + currentDatetimeString);
         }
     }
 
