@@ -105,12 +105,10 @@ public class NoteListActivity extends AppCompatActivity implements
   @Override
   public void onBackPressed() {
 
-
-
-    if(mBackPressed+TIME_INTERVAL > System.currentTimeMillis()){
+    if (mBackPressed + TIME_INTERVAL > System.currentTimeMillis()) {
       super.onBackPressed();
       return;
-    }else{
+    } else {
       Toast.makeText(getBaseContext(), "Tap back again to exit", Toast.LENGTH_SHORT).show();
     }
 
@@ -176,7 +174,6 @@ public class NoteListActivity extends AppCompatActivity implements
     // Check SharedPreferences for Overflow Menu
     boolean debugToggle = sharedPref.getBoolean(getString(R.string.pref_key_isdebug), false);
     menu.findItem(R.id.action_group_debug).setVisible(debugToggle);
-
 
     return true;
   }
@@ -363,7 +360,7 @@ public class NoteListActivity extends AppCompatActivity implements
         });
   }
 
-  private void checkSharedPreferences(){
+  private void checkSharedPreferences() {
 
     sharedPref = this.getSharedPreferences(
         getString(R.string.pref_file_key), Context.MODE_PRIVATE);
