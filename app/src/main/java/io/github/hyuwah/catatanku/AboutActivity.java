@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.Toast;
 
 import java.util.Calendar;
@@ -30,11 +31,20 @@ public class AboutActivity extends AppCompatActivity {
     View aboutPage = new AboutPage(this)
         .isRTL(false)
         .setImage(R.mipmap.ic_launcher)
-        .setDescription("CatatanKu, aplikasi catatan sederhana")
-        .addItem(new Element().setTitle("Version 1.0"))
+        .setDescription("CatatanKu\nSimple note-taking apps")
+        .addItem(new Element().setTitle("Version 1.0").setOnClickListener(view -> {
+          boolean debugToggle = sharedPref.getBoolean(getString(R.string.pref_key_isdebug), false);
+
+          editor.putBoolean(getString(R.string.pref_key_isdebug), !debugToggle);
+          editor.commit();
+
+          Toast.makeText(getBaseContext(),
+              "Debug Mode: " + (!debugToggle ? "Activated" : "Deactivated"), Toast.LENGTH_SHORT)
+              .show();
+        }))
         .addGroup("Connect with developer")
-        .addEmail("muhammad.whydn@gmail.com")
-        .addWebsite("http://hyuwah.github.io/")
+        .addEmail("muhammad.whydn@gmail.com", "Contact developer")
+        .addWebsite("http://hyuwah.github.io/", "Visit developer website")
         .addGitHub("hyuwah", "Check other projects on Github")
         .addItem(getCopyRightsElement())
         .create();
@@ -51,17 +61,8 @@ public class AboutActivity extends AppCompatActivity {
     copyRightsElement.setIconTint(mehdi.sakout.aboutpage.R.color.about_item_icon_color);
     copyRightsElement.setIconNightTint(android.R.color.white);
     copyRightsElement.setGravity(Gravity.CENTER);
-    copyRightsElement.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        Toast.makeText(getBaseContext(), copyrights, Toast.LENGTH_SHORT).show();
-
-        boolean debugToggle = sharedPref.getBoolean(getString(R.string.pref_key_isdebug),false);
-
-        editor.putBoolean(getString(R.string.pref_key_isdebug), !debugToggle);
-        editor.commit();
-      }
-    });
+    copyRightsElement.setOnClickListener(
+        v -> Toast.makeText(AboutActivity.this, "Muhammad Wahyudin", Toast.LENGTH_SHORT).show());
     return copyRightsElement;
   }
 }
