@@ -13,7 +13,7 @@ public class NoteProvider extends ContentProvider {
 
     public static final String TAG = NoteProvider.class.getSimpleName();
 
-    private CatatanKuDbHelper mDbHelper;
+    private CatatanKuSupportDbHelper mDbHelper;
 
     private static final int NOTES = 100;
     private static final int NOTE_ID = 101;
@@ -85,7 +85,7 @@ public class NoteProvider extends ContentProvider {
     @Override
     public boolean onCreate() {
         Log.i(TAG, "onCreate: will instantiate mDbHelper");
-        mDbHelper = new CatatanKuDbHelper(getContext());
+        mDbHelper = new CatatanKuSupportDbHelper(getContext());
         return true;
     }
 

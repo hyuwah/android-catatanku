@@ -12,7 +12,9 @@ import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.customtabs.CustomTabsIntent;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
@@ -27,6 +29,10 @@ import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.Toast;
 
+import io.github.hyuwah.catatanku.adapter.NoteAdapter;
+import io.github.hyuwah.catatanku.adapter.NoteRoomAdapter;
+import io.github.hyuwah.catatanku.storage.CatatanKuDatabase;
+import io.github.hyuwah.catatanku.storage.model.Note;
 import java.util.Date;
 
 import butterknife.BindColor;
@@ -35,6 +41,7 @@ import butterknife.ButterKnife;
 import io.github.hyuwah.catatanku.adapter.NoteCursorAdapter;
 import io.github.hyuwah.catatanku.chrome.CustomTabActivityHelper;
 import io.github.hyuwah.catatanku.storage.NoteContract;
+import java.util.List;
 
 public class NoteListActivity extends AppCompatActivity implements
     LoaderManager.LoaderCallbacks<Cursor> {
@@ -55,6 +62,11 @@ public class NoteListActivity extends AppCompatActivity implements
   // Storage
   private static final int NOTE_LOADER = 0;
   NoteCursorAdapter noteCursorAdapter;
+  NoteAdapter mNoteAdapter;
+  NoteRoomAdapter mNoteRoomAdapter;
+
+  GetData getData = new GetData();
+  Thread mThread;
 
   /**
    * Lifecycle Override
@@ -74,14 +86,16 @@ public class NoteListActivity extends AppCompatActivity implements
 
     prepareListView();
 
-    getLoaderManager().initLoader(NOTE_LOADER, null, this);
+    //getLoaderManager().initLoader(NOTE_LOADER, null, this);
+
+// ROOM
+    new GetData().execute();
 
   }
 
   @Override
   protected void onStart() {
     super.onStart();
-
   }
 
   /**
@@ -202,6 +216,23 @@ public class NoteListActivity extends AppCompatActivity implements
   /**
    * Activity Methods
    */
+
+  // ROOM
+
+  private class GetData extends AsyncTask<Void, Void, Void> {
+
+    @Override
+    protected Void doInBackground(Void... params) {
+      Log.i("NoteListActivity", "doInBackground: Get Data");
+      List<Note> notes = CatatanKuDatabase.getCatatanKuDatabase(getApplicationContext()).getNoteDao().getAll();
+//      mNoteRoomAdapter = new NoteRoomAdapter(getApplicationContext(),notes);
+      mNoteAdapter = new NoteAdapter(getApplicationContext(),notes);
+      lvNoteList.setAdapter(mNoteAdapter);
+      mNoteAdapter.notifyDataSetChanged();
+      Log.i("NoteListActivity", "doInBackground: "+mNoteAdapter.getCount() + " & " + notes.size());
+      return null;
+    }
+  }
 
   // ListView Related
   private void prepareListView() {

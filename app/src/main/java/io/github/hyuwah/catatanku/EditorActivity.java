@@ -10,6 +10,8 @@ import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.AsyncTask;
+import android.os.Handler;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.NavUtils;
@@ -26,6 +28,8 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import io.github.hyuwah.catatanku.storage.CatatanKuDatabase;
+import io.github.hyuwah.catatanku.storage.model.Note;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -49,6 +53,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
 
     private Uri mCurrentNote;
 
+
     final String TAG = this.getClass().getSimpleName();
 
     /**
@@ -71,7 +76,6 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
             tvDatetime.setVisibility(View.VISIBLE);
             getLoaderManager().initLoader(1, null, this);
         }
-
 
 
         hasChanged = false;
@@ -260,28 +264,49 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         values.put(NoteContract.NotesEntry.COLUMN_NOTE_TITLE, title);
         values.put(NoteContract.NotesEntry.COLUMN_NOTE_BODY, body);
 
+        // ROOM
+        Note newNote = new Note();
+        newNote.setTitle(title);
+        newNote.setBody(body);
+
         if (mCurrentNote == null) {
             // Add new
-            values.put(NoteContract.NotesEntry.COLUMN_NOTE_DATETIME, new Date().getTime());
+//            values.put(NoteContract.NotesEntry.COLUMN_NOTE_DATETIME, new Date().getTime());
 
-            Uri newUri = getContentResolver().insert(NoteContract.NotesEntry.CONTENT_URI, values);
+//            Uri newUri = getContentResolver().insert(NoteContract.NotesEntry.CONTENT_URI, values);
 
-            if (newUri != null) {
+            newNote.setCreatedTime(new Date().getTime());
+
+            final Runnable r = () -> {
+                CatatanKuDatabase.getCatatanKuDatabase(getApplicationContext()).getNoteDao().insertNote(newNote);
+            };
+            AsyncTask.execute(r);
+
+
+//            if (newUri != null) {
                 Toast.makeText(this, "Note saved", Toast.LENGTH_SHORT).show();
-            }
+//            }
 
         } else {
             // Edit existing
-            int rowEdited = getContentResolver().update(mCurrentNote, values, null, null);
-            if (rowEdited > 0) {
+//            int rowEdited = getContentResolver().update(mCurrentNote, values, null, null);
+//            if (rowEdited > 0) {
                 Toast.makeText(this, "Note updated", Toast.LENGTH_SHORT).show();
-            }
+//            }
+
+            newNote.setUpdatedTime(new Date().getTime());
+
+            final Runnable r = () -> CatatanKuDatabase.getCatatanKuDatabase(getApplicationContext()).getNoteDao().updateNote(newNote);
+            AsyncTask.execute(r);
+
         }
 
         finish();
     }
 
     private void deleteNote() {
+
+//        final Runnable r = () -> CatatanKuDatabase.getCatatanKuDatabase(getApplicationContext()).getNoteDao().deleteNote(mCurrentNote);
 
         int rowDeleted = getContentResolver().delete(mCurrentNote, null, null);
 
