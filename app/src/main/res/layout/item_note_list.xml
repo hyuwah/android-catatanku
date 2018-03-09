@@ -17,6 +17,7 @@
     android:layout_height="wrap_content"
     android:paddingBottom="8dp"
     android:textAppearance="?android:textAppearanceSmall"
+    android:textSize="12sp"
     tools:text="Senin, 20 Januari 2018 09:23"/>
 
   <TextView

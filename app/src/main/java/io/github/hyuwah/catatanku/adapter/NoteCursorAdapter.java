@@ -59,7 +59,7 @@ public class NoteCursorAdapter extends CursorAdapter {
         String noteBody = cursor.getString(cursor.getColumnIndexOrThrow(NoteContract.NotesEntry.COLUMN_NOTE_BODY));
 
         Date utcTime = new Date(cursor.getLong(cursor.getColumnIndexOrThrow(NoteContract.NotesEntry.COLUMN_NOTE_DATETIME)));
-        String noteTime = new SimpleDateFormat("EEEE, dd MMM yyyy\nHH:mm:ss").format(utcTime);
+        String noteTime = new SimpleDateFormat("EE, dd/MM/yy - HH:mm:ss").format(utcTime);
 
         if(TextUtils.isEmpty(noteTitle)){
             noteTitle="";

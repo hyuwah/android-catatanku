@@ -15,7 +15,9 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.Editable;
 import android.text.InputType;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -28,12 +30,16 @@ import android.widget.Toast;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnTouch;
 import io.github.hyuwah.catatanku.storage.NoteContract;
+import java.util.StringTokenizer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class EditorActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
@@ -41,6 +47,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
     @BindView(R.id.editor_note_title) EditText etTitle;
     @BindView(R.id.editor_note_body) EditText etBody;
     @BindView(R.id.editor_note_datetime) TextView tvDatetime;
+    @BindView(R.id.editor_note_stats) TextView tvStats;
 
     private String currentTitle;
     private String currentBody;
@@ -139,6 +146,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
                     return super.onOptionsItemSelected(item);
                 }
                 showUnsavedChangesDialog((dialogInterface, i) -> {
+                    dialogInterface.dismiss();
                     NavUtils.navigateUpFromSameTask(EditorActivity.this);
                 });
 
@@ -168,7 +176,8 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
             super.onBackPressed();
         } else {
             showUnsavedChangesDialog((dialogInterface, i) -> {
-                super.onBackPressed();
+              dialogInterface.dismiss();
+              super.onBackPressed();
             });
         }
 
@@ -196,11 +205,18 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
             currentTitle = cursor.getString(cursor.getColumnIndex(NoteContract.NotesEntry.COLUMN_NOTE_TITLE));
             currentBody = cursor.getString(cursor.getColumnIndex(NoteContract.NotesEntry.COLUMN_NOTE_BODY));
             currentDatetime = new Date(cursor.getLong(cursor.getColumnIndex(NoteContract.NotesEntry.COLUMN_NOTE_DATETIME)));
-            String currentDatetimeString = new SimpleDateFormat("HH:mm:ss - EEEE, dd MMM yyyy").format(currentDatetime);
+            String currentDatetimeString = new SimpleDateFormat("HH:mm:ss - EE, dd/MM/yy").format(currentDatetime);
 
             etTitle.setText(currentTitle);
             etBody.setText(currentBody);
-            tvDatetime.setText("Created at ➞ " + currentDatetimeString);
+            tvDatetime.setText("Created @ " + currentDatetimeString);
+
+            // Note stats, words and chars count
+//            int charsCount = currentBody.length();
+//            if(charsCount<1){
+//              charsCount=0;
+//            }
+//            tvStats.setText(charsCount+" chars");
         }
     }
 
@@ -231,6 +247,25 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
 
         currentTitle = "";
         currentBody = "";
+
+        // Note stats, Body text listener
+        etBody.addTextChangedListener(new TextWatcher() {
+
+          @Override
+          public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+          }
+
+          @Override
+          public void onTextChanged(CharSequence charSequence, int start, int before, int count) {
+              statsCount(charSequence.toString());
+          }
+
+          @Override
+          public void afterTextChanged(Editable editable) {
+
+          }
+        });
 
     }
 
@@ -326,5 +361,21 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
                     }
                 })
                 .setNegativeButton("Delete", deleteClickListener).show();
+    }
+
+    // on edit text change
+    private void statsCount(String bodyText){
+      int charsCount = bodyText.length();
+
+//      StringTokenizer tokenizer = new StringTokenizer(bodyText);
+//      int wordsCount = tokenizer.countTokens();
+
+      String[] words = bodyText.split("[\\s\\W]+");
+      Log.i(TAG, "statsCount: "+ Arrays.toString(words));
+      int wordsCount =bodyText.isEmpty()?0:words.length;
+
+
+      tvStats.setText(charsCount+" Chars\t"+wordsCount+" Words");
+
     }
 }

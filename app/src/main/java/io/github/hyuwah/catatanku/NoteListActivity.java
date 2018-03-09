@@ -10,12 +10,15 @@ import android.content.CursorLoader;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.Loader;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.customtabs.CustomTabsIntent;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.view.MenuCompat;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.ActionMode;
@@ -47,6 +50,11 @@ public class NoteListActivity extends AppCompatActivity implements
   @BindView(R.id.empty_note_list_view)
   View lvEmptyNoteList;
 
+  Menu menu;
+
+  // Double tap back to exit
+  private static final int TIME_INTERVAL = 2000; // # milliseconds, desired time passed between two back presses.
+  private long mBackPressed;
 
   // Debugging variable
   private Toast mToast;
@@ -55,6 +63,8 @@ public class NoteListActivity extends AppCompatActivity implements
   // Storage
   private static final int NOTE_LOADER = 0;
   NoteCursorAdapter noteCursorAdapter;
+
+  SharedPreferences sharedPref;
 
   /**
    * Lifecycle Override
@@ -76,12 +86,35 @@ public class NoteListActivity extends AppCompatActivity implements
 
     getLoaderManager().initLoader(NOTE_LOADER, null, this);
 
+    checkSharedPreferences();
+
   }
 
   @Override
   protected void onStart() {
     super.onStart();
+    invalidateOptionsMenu();
 
+  }
+
+  @Override
+  protected void onResume() {
+    super.onResume();
+  }
+
+  @Override
+  public void onBackPressed() {
+
+
+
+    if(mBackPressed+TIME_INTERVAL > System.currentTimeMillis()){
+      super.onBackPressed();
+      return;
+    }else{
+      Toast.makeText(getBaseContext(), "Tap back again to exit", Toast.LENGTH_SHORT).show();
+    }
+
+    mBackPressed = System.currentTimeMillis();
   }
 
   /**
@@ -137,6 +170,13 @@ public class NoteListActivity extends AppCompatActivity implements
         return false;
       }
     });
+
+    // Get inflated menu
+    this.menu = menu;
+    // Check SharedPreferences for Overflow Menu
+    boolean debugToggle = sharedPref.getBoolean(getString(R.string.pref_key_isdebug), false);
+    menu.findItem(R.id.action_group_debug).setVisible(debugToggle);
+
 
     return true;
   }
@@ -254,13 +294,13 @@ public class NoteListActivity extends AppCompatActivity implements
               for (int x = 0; x < noteCursorAdapter.getSelectedCount(); x++) {
                 int listId = noteCursorAdapter.getSelectedIds().keyAt(x);
                 long realId = noteCursorAdapter.getItemId(listId);
-                Log.i(this.getClass().getSimpleName(),
-                    "Selected: list id=" + listId + ", db_id=" + realId);
+//                Log.i(this.getClass().getSimpleName(),
+//                    "Selected: list id=" + listId + ", db_id=" + realId);
                 int rowsDeleted = getContentResolver()
                     .delete(ContentUris.withAppendedId(NoteContract.NotesEntry.CONTENT_URI, realId),
                         null, null);
-                Log.i(this.getClass().getSimpleName(),
-                    "onActionItemClicked: rowsDeleted=" + rowsDeleted);
+//                Log.i(this.getClass().getSimpleName(),
+//                    "onActionItemClicked: rowsDeleted=" + rowsDeleted);
 
               }
               Toast.makeText(NoteListActivity.this,
@@ -321,6 +361,12 @@ public class NoteListActivity extends AppCompatActivity implements
           Intent intent = new Intent(Intent.ACTION_VIEW, uri1);
           activity.startActivity(intent);
         });
+  }
+
+  private void checkSharedPreferences(){
+
+    sharedPref = this.getSharedPreferences(
+        getString(R.string.pref_file_key), Context.MODE_PRIVATE);
   }
 
   /**
