@@ -12,6 +12,7 @@ Target SDK : 26
 - [x] Data storage on SQLite using Content Provider
 - [x] Multiselect note deletion
 - [x] Basic search notes
+- [x] MarkdownView
 - [ ] Filter by date time
 - [ ] Sort oldest / newest
 - [ ] Note Tags
@@ -29,6 +30,9 @@ Target SDK : 26
 
 * Android About Page   
 `compile 'com.github.medyo:android-about-page:1.2.2'`
+
+* MarkdownView
+https://github.com/tiagohm/MarkdownView?utm_source=android-arsenal.com&utm_medium=referral&utm_campaign=5386
 
 ## License
 

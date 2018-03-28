@@ -1,10 +1,10 @@
 <resources>
-    <string name="app_name">CatatanKu</string>
-    <string name="action_settings">Settings</string>
-    <string name="action_delete_all">Delete all</string>
-    <string name="action_insert">Insert dummy data</string>
+  <string name="app_name">CatatanKu</string>
+  <string name="action_settings">Settings</string>
+  <string name="action_delete_all">Delete all</string>
+  <string name="action_insert">Insert dummy data</string>
 
-    <!--SharedPreference-->
-    <string name="pref_file_key">io.github.hyuwah.catatanku</string>
-    <string name="pref_key_isdebug">io.github.hyuwah.catatanku.isdebug</string>
+  <!--SharedPreference-->
+  <string name="pref_file_key">io.github.hyuwah.catatanku</string>
+  <string name="pref_key_isdebug">io.github.hyuwah.catatanku.isdebug</string>
 </resources>
