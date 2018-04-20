@@ -19,3 +19,22 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+
+-keep class android.support.v4.** { *; }
+-keep public class * extends android.support.v4.
+-keep public class * extends android.app.Fragment
+
+#ButterKnife
+-keep class butterknife.** { *; }
+-dontwarn butterknife.internal.**
+-keep class **$$ViewBinder { *; }
+-keepclasseswithmembernames class * {
+    @butterknife.* <fields>;
+}
+-keepclasseswithmembernames class * {
+    @butterknife.* <methods>;
+}
+
+-keep class com.vladsch.flexmark.util.** {*;}
+-dontwarn com.vladsch.flexmark.util.**

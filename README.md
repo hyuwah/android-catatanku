@@ -22,18 +22,20 @@ Target SDK : 26
 
 ## Dependency
 * Chrome Custom Tab   
-`compile 'com.android.support:customtabs:26.1.0'`
+`implementation 'com.android.support:customtabs:26.1.0'`
 
 * ButterKnife   
-`compile 'com.jakewharton:butterknife:8.8.1'`   
+`implementation 'com.jakewharton:butterknife:8.8.1'`
 `annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'`
 
 * Android About Page   
-`compile 'com.github.medyo:android-about-page:1.2.2'`
+`implementation 'com.github.medyo:android-about-page:1.2.2'`
 
 * MarkdownView
 https://github.com/tiagohm/MarkdownView?utm_source=android-arsenal.com&utm_medium=referral&utm_campaign=5386
 
+* Lottie Animation
+`implementation 'com.airbnb.android:lottie:2.5.4'`
 ## License
 
 MIT
