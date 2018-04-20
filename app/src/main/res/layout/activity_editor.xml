@@ -1,70 +1,83 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
   xmlns:app="http://schemas.android.com/apk/res-auto"
   xmlns:tools="http://schemas.android.com/tools"
   android:layout_width="match_parent"
   android:layout_height="match_parent"
-  android:fillViewport="true"
-  tools:context="io.github.hyuwah.catatanku.EditorActivity">
+  android:orientation="vertical">
 
-  <LinearLayout
+  <ScrollView
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:layout_marginLeft="16dp"
-    android:layout_marginRight="16dp"
-    android:orientation="vertical">
-
-    <EditText
-      android:id="@+id/editor_note_title"
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:layout_marginTop="16dp"
-      android:background="@android:color/transparent"
-      android:hint="Title"
-      android:inputType="textAutoCorrect|textShortMessage"
-      android:textAppearance="@style/TextAppearance.AppCompat.Title"/>
-
-    <EditText
-      android:id="@+id/editor_note_body"
-      android:layout_width="match_parent"
-      android:layout_height="match_parent"
-      android:layout_weight="1"
-      android:layout_marginTop="16dp"
-      android:background="@android:color/transparent"
-      android:gravity="top"
-      android:hint="Note"
-      android:imeOptions="actionDone"
-      android:inputType="textMultiLine|textLongMessage|textAutoCorrect"/>
+    android:layout_height="wrap_content"
+    android:layout_weight="1"
+    android:fillViewport="true"
+    tools:context="io.github.hyuwah.catatanku.EditorActivity">
 
     <LinearLayout
       android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:orientation="horizontal">
-      <TextView
-        android:id="@+id/editor_note_stats"
+      android:layout_height="match_parent"
+      android:layout_marginLeft="16dp"
+      android:layout_marginRight="16dp"
+      android:orientation="vertical">
+
+      <EditText
+        android:id="@+id/editor_note_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp"
-        android:layout_gravity="center_vertical"
-        android:textSize="12sp"
-        tools:text="# Words # Chars"/>
-      <TextView
-        android:id="@+id/editor_note_datetime"
+        android:layout_marginTop="16dp"
+        android:background="@android:color/transparent"
+        android:hint="Title"
+        android:inputType="textAutoCorrect|textShortMessage"
+        android:textAppearance="@style/TextAppearance.AppCompat.Title"/>
+
+      <EditText
+        android:id="@+id/editor_note_body"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_weight="1"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp"
-        android:gravity="end"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:textSize="12sp"
-        tools:text="Created: jam hari tanggal"/>
+        android:layout_marginTop="16dp"
+        android:background="@android:color/transparent"
+        android:gravity="top"
+        android:hint="Note"
+        android:imeOptions="actionDone"
+        android:inputType="textMultiLine|textLongMessage|textAutoCorrect"/>
+
+
     </LinearLayout>
+
+  </ScrollView>
+
+  <LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingLeft="8dp"
+    android:paddingRight="8dp"
+    android:background="#333"
+    android:orientation="horizontal">
+    <TextView
+      android:id="@+id/editor_note_stats"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_weight="1"
+      android:layout_marginTop="8dp"
+      android:layout_marginBottom="8dp"
+      android:layout_gravity="center_vertical"
+      android:textColor="@color/white"
+      android:textSize="12sp"
+      tools:text="# Words # Chars"/>
+    <TextView
+      android:id="@+id/editor_note_datetime"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_weight="1"
+      android:layout_marginTop="8dp"
+      android:layout_marginBottom="8dp"
+      android:gravity="end"
+      android:textAppearance="?android:attr/textAppearanceSmall"
+      android:textColor="@color/white"
+      android:textSize="12sp"
+      tools:text="Created: jam hari tanggal"/>
   </LinearLayout>
 
-</ScrollView>
-
+</LinearLayout>

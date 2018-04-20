@@ -28,6 +28,8 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import br.tiagohm.markdownview.MarkdownView;
+import br.tiagohm.markdownview.css.styles.Github;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
@@ -117,13 +119,17 @@ public class EditorActivity extends AppCompatActivity implements
 
     switch (item.getItemId()) {
 
+      case R.id.editor_action_markdown:
+        Intent markdownIntent = new Intent(this, EditorMarkdownActivity.class);
+        // TODO emptyview data disini atau di activity nya?
+        markdownIntent.putExtra("TITLE", etTitle.getText().toString());
+        markdownIntent.putExtra("BODY", etBody.getText().toString());
+        startActivity(markdownIntent);
+
+        return true;
+
       case R.id.editor_action_delete:
-        showDeleteConfirmationDialog(new DialogInterface.OnClickListener() {
-          @Override
-          public void onClick(DialogInterface dialogInterface, int i) {
-            deleteNote();
-          }
-        });
+        showDeleteConfirmationDialog((dialogInterface, i) -> deleteNote());
         return true;
 
       case R.id.editor_action_clear:
@@ -228,6 +234,7 @@ public class EditorActivity extends AppCompatActivity implements
       etTitle.setText(currentTitle);
       etBody.setText(currentBody);
       tvDatetime.setText("Created @ " + currentDatetimeString);
+
 
     }
   }
@@ -379,14 +386,11 @@ public class EditorActivity extends AppCompatActivity implements
   private void statsCount(String bodyText) {
     int charsCount = bodyText.length();
 
-//      StringTokenizer tokenizer = new StringTokenizer(bodyText);
-//      int wordsCount = tokenizer.countTokens();
-
     String[] words = bodyText.split("[\\s\\W]+");
     Log.i(TAG, "statsCount: " + Arrays.toString(words));
     int wordsCount = bodyText.isEmpty() ? 0 : words.length;
 
-    tvStats.setText(charsCount + " Chars\t" + wordsCount + " Words");
+    tvStats.setText(charsCount + " Chars " + wordsCount + " Words");
 
   }
 }
