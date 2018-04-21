@@ -1,4 +1,4 @@
-package io.github.hyuwah.catatanku.chrome;
+package io.github.hyuwah.catatanku.utils.chrome;
 
 import android.content.Context;
 import android.content.Intent;
@@ -6,7 +6,6 @@ import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.net.Uri;
-import android.support.customtabs.CustomTabsClient;
 import android.text.TextUtils;
 import android.util.Log;
 

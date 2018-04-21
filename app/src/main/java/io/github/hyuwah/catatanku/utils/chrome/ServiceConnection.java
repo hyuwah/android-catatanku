@@ -1,4 +1,4 @@
-package io.github.hyuwah.catatanku.chrome;
+package io.github.hyuwah.catatanku.utils.chrome;
 
 import android.content.ComponentName;
 import android.support.customtabs.CustomTabsClient;

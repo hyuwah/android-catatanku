@@ -1,11 +1,11 @@
-package io.github.hyuwah.catatanku.storage;
+package io.github.hyuwah.catatanku.utils.storage;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
-import io.github.hyuwah.catatanku.storage.NoteContract.NotesEntry;
+import io.github.hyuwah.catatanku.utils.storage.NoteContract.NotesEntry;
 
 /**
  * Created by hyuwah on 26/01/18.

@@ -1,8 +1,7 @@
-package io.github.hyuwah.catatanku;
+package io.github.hyuwah.catatanku.editor;
 
 import android.app.AlertDialog;
 import android.app.LoaderManager;
-import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.CursorLoader;
 import android.content.DialogInterface;
@@ -10,27 +9,21 @@ import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
-import android.support.design.widget.CoordinatorLayout;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
-import android.text.InputType;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import br.tiagohm.markdownview.MarkdownView;
-import br.tiagohm.markdownview.css.styles.Github;
-import java.io.IOException;
+import io.github.hyuwah.catatanku.R;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
@@ -38,10 +31,7 @@ import java.util.Date;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnTouch;
-import io.github.hyuwah.catatanku.storage.NoteContract;
-import java.util.StringTokenizer;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import io.github.hyuwah.catatanku.utils.storage.NoteContract;
 
 public class EditorActivity extends AppCompatActivity implements
     LoaderManager.LoaderCallbacks<Cursor> {

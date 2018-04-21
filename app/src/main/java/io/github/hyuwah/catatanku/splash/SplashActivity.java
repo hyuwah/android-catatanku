@@ -1,10 +1,11 @@
-package io.github.hyuwah.catatanku;
+package io.github.hyuwah.catatanku.splash;
 
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
-import butterknife.BindView;
+import io.github.hyuwah.catatanku.R;
+import io.github.hyuwah.catatanku.notelist.NoteListActivity;
 
 public class SplashActivity extends AppCompatActivity {
 

@@ -1,4 +1,4 @@
-package io.github.hyuwah.catatanku;
+package io.github.hyuwah.catatanku.about;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -6,9 +6,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.Toast;
 
+import io.github.hyuwah.catatanku.R;
 import java.util.Calendar;
 
 import mehdi.sakout.aboutpage.AboutPage;
