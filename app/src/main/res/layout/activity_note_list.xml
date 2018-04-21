@@ -21,22 +21,32 @@
         android:layout_height="wrap_content"
         android:layout_centerInParent="true">
 
-        <ImageView
-            android:id="@+id/empty_nlv_image"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/file"
-            android:layout_centerHorizontal="true"/>
+        <!--<ImageView-->
+            <!--android:id="@+id/empty_nlv_image"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:src="@drawable/file"-->
+          <!--android:visibility="gone"-->
+            <!--android:layout_centerHorizontal="true"/>-->
+
+        <com.airbnb.lottie.LottieAnimationView
+          android:id="@+id/lottie_empty"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          app:lottie_rawRes="@raw/empty_status"
+          app:lottie_loop="true"
+          app:lottie_autoPlay="true"
+          />
 
         <TextView
-            android:layout_marginTop="4dp"
+            android:layout_marginTop="8dp"
             android:textAlignment="center"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
             android:text="It's empty...\nAdd some notes via button below"
             android:textAppearance="?android:textAppearanceSmall"
-            android:layout_below="@+id/empty_nlv_image"/>
+            android:layout_below="@+id/lottie_empty"/>
 
     </RelativeLayout>
 
