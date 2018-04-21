@@ -1,4 +1,4 @@
-package io.github.hyuwah.catatanku.adapter;
+package io.github.hyuwah.catatanku.notelist;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -13,11 +13,10 @@ import android.widget.TextView;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import butterknife.BindColor;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.github.hyuwah.catatanku.R;
-import io.github.hyuwah.catatanku.storage.NoteContract;
+import io.github.hyuwah.catatanku.utils.storage.NoteContract;
 
 /**
  * Created by hyuwah on 26/01/18.

@@ -1,4 +1,4 @@
-package io.github.hyuwah.catatanku.storage;
+package io.github.hyuwah.catatanku.utils.storage;
 
 import android.content.ContentResolver;
 import android.net.Uri;

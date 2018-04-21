@@ -1,26 +1,18 @@
-package io.github.hyuwah.catatanku;
+package io.github.hyuwah.catatanku.notelist;
 
 import android.app.AlertDialog;
-import android.app.LoaderManager;
 import android.app.SearchManager;
 import android.content.ContentUris;
-import android.content.ContentValues;
 import android.content.Context;
-import android.content.CursorLoader;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.Loader;
 import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.customtabs.CustomTabsIntent;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.view.MenuCompat;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.ActionMode;
 import android.view.View;
 import android.view.Menu;
@@ -30,17 +22,17 @@ import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.Toast;
 
-import java.util.Date;
+import io.github.hyuwah.catatanku.about.AboutActivity;
+import io.github.hyuwah.catatanku.editor.EditorActivity;
+import io.github.hyuwah.catatanku.R;
 
-import butterknife.BindColor;
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import io.github.hyuwah.catatanku.adapter.NoteCursorAdapter;
-import io.github.hyuwah.catatanku.chrome.CustomTabActivityHelper;
-import io.github.hyuwah.catatanku.storage.NoteContract;
+import io.github.hyuwah.catatanku.utils.chrome.CustomTabActivityHelper;
+import io.github.hyuwah.catatanku.utils.storage.NoteContract;
 
 public class NoteListActivity extends AppCompatActivity implements
-    LoaderManager.LoaderCallbacks<Cursor> {
+    NoteListContract.View {
 
   // Views
   @BindView(R.id.fab)
@@ -52,16 +44,15 @@ public class NoteListActivity extends AppCompatActivity implements
 
   Menu menu;
 
+  private NoteListPresenter mPresenter;
+
   // Double tap back to exit
   private static final int TIME_INTERVAL = 2000; // # milliseconds, desired time passed between two back presses.
   private long mBackPressed;
 
   // Debugging variable
   private Toast mToast;
-  private int dummyDataCount = 10;
 
-  // Storage
-  private static final int NOTE_LOADER = 0;
   NoteCursorAdapter noteCursorAdapter;
 
   SharedPreferences sharedPref;
@@ -84,7 +75,7 @@ public class NoteListActivity extends AppCompatActivity implements
 
     prepareListView();
 
-    getLoaderManager().initLoader(NOTE_LOADER, null, this);
+    mPresenter = new NoteListPresenter(getLoaderManager(), noteCursorAdapter, this);
 
     checkSharedPreferences();
 
@@ -94,12 +85,13 @@ public class NoteListActivity extends AppCompatActivity implements
   protected void onStart() {
     super.onStart();
     invalidateOptionsMenu();
-
   }
 
   @Override
-  protected void onResume() {
+  public void onResume() {
     super.onResume();
+    // need to kickoff the loadermanager again
+    mPresenter.start();
   }
 
   @Override
@@ -123,7 +115,8 @@ public class NoteListActivity extends AppCompatActivity implements
   public boolean onPrepareOptionsMenu(Menu menu) {
     super.onPrepareOptionsMenu(menu);
     MenuItem insertDummyData = menu.findItem(R.id.action_insert);
-    insertDummyData.setTitle("Insert " + String.valueOf(dummyDataCount) + " data");
+    insertDummyData
+        .setTitle("Insert " + String.valueOf(NoteListPresenter.dummyDataCount) + " data");
     return true;
   }
 
@@ -145,26 +138,7 @@ public class NoteListActivity extends AppCompatActivity implements
 
       @Override
       public boolean onQueryTextChange(String s) {
-
-        String selectionClause = NoteContract.NotesEntry.COLUMN_NOTE_TITLE + " LIKE ? OR "
-            + NoteContract.NotesEntry.COLUMN_NOTE_BODY + " LIKE ?";
-        String[] selectionArgs = new String[]{
-            "%" + s + "%",
-            "%" + s + "%"
-        };
-
-        Cursor cursor = getContentResolver().query(
-            NoteContract.NotesEntry.CONTENT_URI,
-            NoteContract.NotesEntry.DEFAULT_PROJECTION,
-            selectionClause,
-            selectionArgs,
-            NoteContract.NotesEntry.SORT_TIME_DESC
-        );
-        Log.i(this.getClass().getSimpleName(), "onQueryTextChange: " + cursor.getCount());
-        if (cursor != null) {
-          noteCursorAdapter.swapCursor(cursor);
-        }
-
+        mPresenter.searchQuery(s);
         return false;
       }
     });
@@ -182,12 +156,11 @@ public class NoteListActivity extends AppCompatActivity implements
   public boolean onOptionsItemSelected(MenuItem item) {
     switch (item.getItemId()) {
       case R.id.action_delete_all:
-        int rowsDeleted = getContentResolver()
-            .delete(NoteContract.NotesEntry.CONTENT_URI, null, null);
+        mPresenter.deleteAllNotes();
         return true;
 
       case R.id.action_insert:
-        generateDummyNote();
+        mPresenter.generateDummyNotes();
         return true;
 
       case R.id.action_gitbook_journal:
@@ -210,30 +183,6 @@ public class NoteListActivity extends AppCompatActivity implements
       default:
         return super.onOptionsItemSelected(item);
     }
-  }
-
-  /**
-   * Implements CursorLoader
-   */
-
-  @Override
-  public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
-
-    return new CursorLoader(this, NoteContract.NotesEntry.CONTENT_URI,
-        NoteContract.NotesEntry.DEFAULT_PROJECTION,
-        null,
-        null,
-        NoteContract.NotesEntry.SORT_TIME_DESC);
-  }
-
-  @Override
-  public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
-    noteCursorAdapter.swapCursor(cursor);
-  }
-
-  @Override
-  public void onLoaderReset(Loader<Cursor> loader) {
-    noteCursorAdapter.swapCursor(null);
   }
 
   /**
@@ -288,22 +237,11 @@ public class NoteListActivity extends AppCompatActivity implements
           case R.id.onselect_delete:
 
             showDeleteConfirmationDialog((dialogInterface, i) -> {
-              for (int x = 0; x < noteCursorAdapter.getSelectedCount(); x++) {
-                int listId = noteCursorAdapter.getSelectedIds().keyAt(x);
-                long realId = noteCursorAdapter.getItemId(listId);
-//                Log.i(this.getClass().getSimpleName(),
-//                    "Selected: list id=" + listId + ", db_id=" + realId);
-                int rowsDeleted = getContentResolver()
-                    .delete(ContentUris.withAppendedId(NoteContract.NotesEntry.CONTENT_URI, realId),
-                        null, null);
-//                Log.i(this.getClass().getSimpleName(),
-//                    "onActionItemClicked: rowsDeleted=" + rowsDeleted);
 
-              }
+              int rowsDeleted = mPresenter.deleteSelectedNotes();
               Toast.makeText(NoteListActivity.this,
-                  "Deleted " + noteCursorAdapter.getSelectedCount() + " notes", Toast.LENGTH_SHORT)
+                  "Deleted " + rowsDeleted + (rowsDeleted>1?" notes":" note"), Toast.LENGTH_SHORT)
                   .show();
-              noteCursorAdapter.removeSelection();
               actionMode.finish();
             });
 
@@ -331,7 +269,8 @@ public class NoteListActivity extends AppCompatActivity implements
 
   }
 
-  private void showDeleteConfirmationDialog(DialogInterface.OnClickListener deleteClickListener) {
+  @Override
+  public void showDeleteConfirmationDialog(DialogInterface.OnClickListener deleteClickListener) {
 
     AlertDialog.Builder builder = new AlertDialog.Builder(this);
     builder.setMessage("Selected note(s) will be deleted!")
@@ -366,27 +305,13 @@ public class NoteListActivity extends AppCompatActivity implements
         getString(R.string.pref_file_key), Context.MODE_PRIVATE);
   }
 
-  /**
-   * Dummy notes data
-   */
-
-  private void generateDummyNote() {
-
-    for (int i = 0; i < dummyDataCount; i++) {
-
-      int randomTitleNum = (int) Math.floor(Math.random() * 100);
-      int randomBodyNum = (int) Math.floor(Math.random() * 1000);
-
-      ContentValues values = new ContentValues();
-      values.put(NoteContract.NotesEntry.COLUMN_NOTE_TITLE, "Judul" + randomTitleNum);
-      values.put(NoteContract.NotesEntry.COLUMN_NOTE_BODY,
-          randomBodyNum + ". Lorem ipsum dolor sit amet");
-      values.put(NoteContract.NotesEntry.COLUMN_NOTE_DATETIME, new Date().getTime());
-
-      Uri newUri = getContentResolver().insert(NoteContract.NotesEntry.CONTENT_URI, values);
-      Log.i(this.getClass().getSimpleName(), "generateDummyNote: " + values.toString());
-    }
-
+  @Override
+  public Context getActivityContext() {
+    return this;
   }
 
+  @Override
+  public void setPresenter(NoteListContract.Presenter presenter) {
+//    mPresenter = presenter;
+  }
 }

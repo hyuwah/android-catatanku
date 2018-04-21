@@ -1,4 +1,4 @@
-package io.github.hyuwah.catatanku;
+package io.github.hyuwah.catatanku.editor;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -8,6 +8,7 @@ import br.tiagohm.markdownview.MarkdownView;
 import br.tiagohm.markdownview.css.styles.Github;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.github.hyuwah.catatanku.R;
 
 public class EditorMarkdownActivity extends AppCompatActivity {
 

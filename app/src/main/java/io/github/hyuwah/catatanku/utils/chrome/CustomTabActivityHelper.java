@@ -1,7 +1,6 @@
-package io.github.hyuwah.catatanku.chrome;
+package io.github.hyuwah.catatanku.utils.chrome;
 
 import android.app.Activity;
-import android.content.ServiceConnection;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.customtabs.CustomTabsClient;
@@ -93,7 +92,7 @@ public class CustomTabActivityHelper implements ServiceConnectionCallback {
         String packageName = CustomTabsHelper.getPackageNameToUse(activity);
         if (packageName == null) return;
 
-        mConnection = new io.github.hyuwah.catatanku.chrome.ServiceConnection(this);
+        mConnection = new io.github.hyuwah.catatanku.utils.chrome.ServiceConnection(this);
         CustomTabsClient.bindCustomTabsService(activity, packageName, mConnection);
     }
 
