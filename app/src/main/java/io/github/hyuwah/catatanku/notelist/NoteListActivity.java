@@ -28,6 +28,7 @@ import io.github.hyuwah.catatanku.R;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.github.hyuwah.catatanku.editor.EditorMarkdownActivity;
 import io.github.hyuwah.catatanku.utils.chrome.CustomTabActivityHelper;
 import io.github.hyuwah.catatanku.utils.storage.NoteContract;
 
@@ -261,7 +262,7 @@ public class NoteListActivity extends AppCompatActivity implements
 
     // Onclick listView
     lvNoteList.setOnItemClickListener((adapterView, view, position, id) -> {
-      Intent intent = new Intent(NoteListActivity.this, EditorActivity.class);
+      Intent intent = new Intent(NoteListActivity.this, EditorMarkdownActivity.class);
       Uri currentNoteUri = ContentUris.withAppendedId(NoteContract.NotesEntry.CONTENT_URI, id);
       intent.setData(currentNoteUri);
       startActivity(intent);

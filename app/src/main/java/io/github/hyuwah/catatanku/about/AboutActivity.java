@@ -32,7 +32,7 @@ public class AboutActivity extends AppCompatActivity {
         .isRTL(false)
         .setImage(R.mipmap.ic_launcher)
         .setDescription("CatatanKu\nSimple note-taking apps")
-        .addItem(new Element().setTitle("Version 1.0").setOnClickListener(view -> {
+        .addItem(new Element().setTitle("Version "+ getResources().getString(R.string.versionName)).setOnClickListener(view -> {
           boolean debugToggle = sharedPref.getBoolean(getString(R.string.pref_key_isdebug), false);
 
           editor.putBoolean(getString(R.string.pref_key_isdebug), !debugToggle);
