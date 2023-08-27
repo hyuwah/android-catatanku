@@ -9,25 +9,24 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.customtabs.CustomTabsIntent;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.view.ActionMode;
-import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.AbsListView;
 import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.browser.customtabs.CustomTabsIntent;
+import androidx.core.content.ContextCompat;
+
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
+import io.github.hyuwah.catatanku.R;
 import io.github.hyuwah.catatanku.about.AboutActivity;
 import io.github.hyuwah.catatanku.editor.EditorActivity;
-import io.github.hyuwah.catatanku.R;
-
-import butterknife.BindView;
-import butterknife.ButterKnife;
 import io.github.hyuwah.catatanku.utils.chrome.CustomTabActivityHelper;
 import io.github.hyuwah.catatanku.utils.storage.NoteContract;
 
@@ -35,11 +34,8 @@ public class NoteListActivity extends AppCompatActivity implements
     NoteListContract.View {
 
   // Views
-  @BindView(R.id.fab)
   FloatingActionButton fab;
-  @BindView(R.id.lv_note_list)
   ListView lvNoteList;
-  @BindView(R.id.empty_note_list_view)
   View lvEmptyNoteList;
 
   Menu menu;
@@ -66,7 +62,9 @@ public class NoteListActivity extends AppCompatActivity implements
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_note_list);
 
-    ButterKnife.bind(this);
+    fab = findViewById(R.id.fab);
+    lvNoteList = findViewById(R.id.lv_note_list);
+    lvEmptyNoteList = findViewById(R.id.empty_note_list_view);
 
     fab.setOnClickListener(view -> {
       Intent intent = new Intent(NoteListActivity.this, EditorActivity.class);

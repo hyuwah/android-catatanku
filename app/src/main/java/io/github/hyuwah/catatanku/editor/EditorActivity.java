@@ -9,8 +9,6 @@ import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
-import android.support.v4.app.NavUtils;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -23,27 +21,23 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import io.github.hyuwah.catatanku.R;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.NavUtils;
+
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.OnTouch;
+import io.github.hyuwah.catatanku.R;
 import io.github.hyuwah.catatanku.utils.storage.NoteContract;
 
 public class EditorActivity extends AppCompatActivity implements
     LoaderManager.LoaderCallbacks<Cursor> {
 
   //Views
-  @BindView(R.id.editor_note_title)
   EditText etTitle;
-  @BindView(R.id.editor_note_body)
   EditText etBody;
-  @BindView(R.id.editor_note_datetime)
   TextView tvDatetime;
-  @BindView(R.id.editor_note_stats)
   TextView tvStats;
 
   private String currentTitle;
@@ -240,7 +234,6 @@ public class EditorActivity extends AppCompatActivity implements
    * Activity Methods
    */
 
-  @OnTouch({R.id.editor_note_title, R.id.editor_note_body})
   public boolean setHasChanged() {
     hasChanged = true;
     return false;
@@ -248,7 +241,13 @@ public class EditorActivity extends AppCompatActivity implements
 
   private void setupView() {
 
-    ButterKnife.bind(this);
+    etTitle = findViewById(R.id.editor_note_title);
+    etBody = findViewById(R.id.editor_note_body);
+    tvDatetime = findViewById(R.id.editor_note_datetime);
+    tvStats = findViewById(R.id.editor_note_stats);
+
+    etTitle.setOnTouchListener((view, motionEvent) -> setHasChanged());
+    etBody.setOnTouchListener((view, motionEvent) -> setHasChanged());
 
     etTitle.setImeOptions(EditorInfo.IME_ACTION_NEXT);
     etTitle.setHorizontallyScrolling(false);

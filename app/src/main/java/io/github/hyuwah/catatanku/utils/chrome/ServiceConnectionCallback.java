@@ -1,6 +1,6 @@
 package io.github.hyuwah.catatanku.utils.chrome;
 
-import android.support.customtabs.CustomTabsClient;
+import androidx.browser.customtabs.CustomTabsClient;
 
 /**
  * Callback for events when connecting and disconnecting from Custom Tabs Service.

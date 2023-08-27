@@ -2,8 +2,8 @@ package io.github.hyuwah.catatanku.notelist;
 
 import android.content.Context;
 import android.content.DialogInterface;
-import android.provider.ContactsContract.CommonDataKinds.Note;
-import android.support.annotation.NonNull;
+
+import androidx.annotation.NonNull;
 import io.github.hyuwah.catatanku.BasePresenter;
 import io.github.hyuwah.catatanku.BaseView;
 

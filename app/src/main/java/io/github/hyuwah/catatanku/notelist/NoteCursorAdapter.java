@@ -13,8 +13,6 @@ import android.widget.TextView;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
 import io.github.hyuwah.catatanku.R;
 import io.github.hyuwah.catatanku.utils.storage.NoteContract;
 
@@ -24,9 +22,9 @@ import io.github.hyuwah.catatanku.utils.storage.NoteContract;
 
 public class NoteCursorAdapter extends CursorAdapter {
 
-    @BindView(R.id.note_title) TextView tvTitle;
-    @BindView(R.id.note_excerpt) TextView tvBody;
-    @BindView(R.id.note_time) TextView tvDatetime;
+    TextView tvTitle;
+    TextView tvBody;
+    TextView tvDatetime;
 
     private SparseBooleanArray mSelectedItemsIds;
 
@@ -43,7 +41,9 @@ public class NoteCursorAdapter extends CursorAdapter {
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
 
-        ButterKnife.bind(this,view);
+        tvTitle = view.findViewById(R.id.note_title);
+        tvBody = view.findViewById(R.id.note_excerpt);
+        tvDatetime = view.findViewById(R.id.note_time);
 
         // Truncate title if too long
         tvTitle.setMaxLines(3);
