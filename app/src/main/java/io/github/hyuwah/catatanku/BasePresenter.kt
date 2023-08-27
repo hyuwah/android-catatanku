@@ -1,5 +1,5 @@
-package io.github.hyuwah.catatanku;
+package io.github.hyuwah.catatanku
 
-public interface BasePresenter {
-  void start();
+interface BasePresenter {
+    fun start()
 }

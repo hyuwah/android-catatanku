@@ -1,107 +1,87 @@
-package io.github.hyuwah.catatanku.notelist;
+package io.github.hyuwah.catatanku.notelist
 
-import android.content.Context;
-import android.database.Cursor;
-import android.text.TextUtils;
-import android.util.SparseBooleanArray;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.CursorAdapter;
-import android.widget.TextView;
-
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
-import io.github.hyuwah.catatanku.R;
-import io.github.hyuwah.catatanku.utils.storage.NoteContract;
+import android.content.Context
+import android.database.Cursor
+import android.text.TextUtils
+import android.util.SparseBooleanArray
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.CursorAdapter
+import android.widget.TextView
+import io.github.hyuwah.catatanku.R
+import io.github.hyuwah.catatanku.databinding.ItemNoteListBinding
+import io.github.hyuwah.catatanku.utils.storage.NoteContract
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 /**
  * Created by hyuwah on 26/01/18.
  */
+class NoteCursorAdapter(context: Context, c: Cursor?) : CursorAdapter(context, c, 0) {
+    var selectedIds: SparseBooleanArray
+        private set
 
-public class NoteCursorAdapter extends CursorAdapter {
-
-    TextView tvTitle;
-    TextView tvBody;
-    TextView tvDatetime;
-
-    private SparseBooleanArray mSelectedItemsIds;
-
-    public NoteCursorAdapter(Context context, Cursor c) {
-        super(context, c, 0);
-        mSelectedItemsIds = new SparseBooleanArray();
+    init {
+        selectedIds = SparseBooleanArray()
     }
 
-    @Override
-    public View newView(Context context, Cursor cursor, ViewGroup viewGroup) {
-        return LayoutInflater.from(context).inflate(R.layout.item_note_list, viewGroup, false);
+    override fun newView(context: Context, cursor: Cursor, viewGroup: ViewGroup): View {
+        return LayoutInflater.from(context).inflate(R.layout.item_note_list, viewGroup, false)
     }
 
-    @Override
-    public void bindView(View view, Context context, Cursor cursor) {
-
-        tvTitle = view.findViewById(R.id.note_title);
-        tvBody = view.findViewById(R.id.note_excerpt);
-        tvDatetime = view.findViewById(R.id.note_time);
+    override fun bindView(view: View, context: Context, cursor: Cursor) {
+        val binding = ItemNoteListBinding.bind(view)
 
         // Truncate title if too long
-        tvTitle.setMaxLines(3);
-        tvTitle.setEllipsize(TextUtils.TruncateAt.END);
+        binding.noteTitle.maxLines = 3
+        binding.noteTitle.ellipsize = TextUtils.TruncateAt.END
 
         // Just show excerpt of note body
-        tvBody.setMaxLines(3);
-        tvBody.setEllipsize(TextUtils.TruncateAt.END);
+        binding.noteExcerpt.maxLines = 3
+        binding.noteExcerpt.ellipsize = TextUtils.TruncateAt.END
 
         // Get data from cursor
-        String noteTitle = cursor.getString(cursor.getColumnIndexOrThrow(NoteContract.NotesEntry.COLUMN_NOTE_TITLE));
-        String noteBody = cursor.getString(cursor.getColumnIndexOrThrow(NoteContract.NotesEntry.COLUMN_NOTE_BODY));
-
-        Date utcTime = new Date(cursor.getLong(cursor.getColumnIndexOrThrow(NoteContract.NotesEntry.COLUMN_NOTE_DATETIME)));
-        String noteTime = new SimpleDateFormat("EE, dd/MM/yy - HH:mm:ss").format(utcTime);
-
-        if(TextUtils.isEmpty(noteTitle)){
-            noteTitle="";
+        var noteTitle =
+            cursor.getString(cursor.getColumnIndexOrThrow(NoteContract.NotesEntry.COLUMN_NOTE_TITLE))
+        val noteBody =
+            cursor.getString(cursor.getColumnIndexOrThrow(NoteContract.NotesEntry.COLUMN_NOTE_BODY))
+        val utcTime =
+            Date(cursor.getLong(cursor.getColumnIndexOrThrow(NoteContract.NotesEntry.COLUMN_NOTE_DATETIME)))
+        val noteTime = SimpleDateFormat("EE, dd/MM/yy - HH:mm:ss", Locale.getDefault()).format(utcTime)
+        if (TextUtils.isEmpty(noteTitle)) {
+            noteTitle = ""
         }
-
-        tvTitle.setText(noteTitle);
-        tvBody.setText(noteBody);
-        tvDatetime.setText(noteTime);
+        binding.noteTitle.text = noteTitle
+        binding.noteExcerpt.text = noteBody
+        binding.noteTime.text = noteTime
     }
-
 
     /**
      * Selection on ListView
      */
-    public void  toggleSelection(int position) {
-        selectView(position, !mSelectedItemsIds.get(position));
+    fun toggleSelection(position: Int) {
+        selectView(position, !selectedIds[position])
     }
 
     // Remove selection after unchecked
-    public void  removeSelection() {
-        mSelectedItemsIds = new  SparseBooleanArray();
-        notifyDataSetChanged();
+    fun removeSelection() {
+        selectedIds = SparseBooleanArray()
+        notifyDataSetChanged()
     }
 
     // Item checked on selection
-    public void selectView(int position, boolean value) {
+    private fun selectView(position: Int, value: Boolean) {
         if (value) {
-            mSelectedItemsIds.put(position, value);
+            selectedIds.put(position, value)
+        } else {
+            selectedIds.delete(position)
         }
-        else{
-            mSelectedItemsIds.delete(position);
-        }
-        notifyDataSetChanged();
+        notifyDataSetChanged()
     }
 
-    // Get number of selected item
-    public int  getSelectedCount() {
-        return mSelectedItemsIds.size();
-    }
-
-    public  SparseBooleanArray getSelectedIds() {
-        return mSelectedItemsIds;
-    }
-
-
+    val selectedCount: Int
+        // Get number of selected item
+        get() = selectedIds.size()
 }

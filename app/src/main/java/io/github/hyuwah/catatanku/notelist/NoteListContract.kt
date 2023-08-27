@@ -1,31 +1,20 @@
-package io.github.hyuwah.catatanku.notelist;
+package io.github.hyuwah.catatanku.notelist
 
-import android.content.Context;
-import android.content.DialogInterface;
+import android.content.Context
+import android.content.DialogInterface
+import io.github.hyuwah.catatanku.BasePresenter
+import io.github.hyuwah.catatanku.BaseView
 
-import androidx.annotation.NonNull;
-import io.github.hyuwah.catatanku.BasePresenter;
-import io.github.hyuwah.catatanku.BaseView;
+interface NoteListContract {
+    interface View : BaseView<Presenter> {
+        val activityContext: Context?
+        fun showDeleteConfirmationDialog(deleteClickListener: DialogInterface.OnClickListener?)
+    }
 
-public interface NoteListContract {
-  interface View extends BaseView<Presenter>{
-
-    Context getActivityContext();
-
-    void showDeleteConfirmationDialog(DialogInterface.OnClickListener deleteClickListener);
-
-  }
-
-  interface Presenter extends BasePresenter{
-
-    Context getActivityContext();
-
-    void generateDummyNotes();
-
-    void deleteAllNotes();
-
-    int deleteSelectedNotes();
-
-    void searchQuery(String s);
-  }
+    interface Presenter : BasePresenter {
+        fun generateDummyNotes()
+        fun deleteAllNotes()
+        fun deleteSelectedNotes(): Int
+        fun searchQuery(s: String?)
+    }
 }
