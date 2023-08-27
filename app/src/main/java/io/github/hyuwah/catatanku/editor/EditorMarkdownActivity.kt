@@ -1,40 +1,34 @@
-package io.github.hyuwah.catatanku.editor;
+package io.github.hyuwah.catatanku.editor
 
-import android.os.Bundle;
-import android.text.TextUtils;
+import android.os.Bundle
+import android.text.TextUtils
+import androidx.appcompat.app.AppCompatActivity
+import br.tiagohm.markdownview.MarkdownView
+import br.tiagohm.markdownview.css.styles.Github
+import io.github.hyuwah.catatanku.R
+import io.github.hyuwah.catatanku.databinding.ActivityEditorMarkdownBinding
 
-import androidx.appcompat.app.AppCompatActivity;
+class EditorMarkdownActivity : AppCompatActivity() {
 
-import br.tiagohm.markdownview.MarkdownView;
-import br.tiagohm.markdownview.css.styles.Github;
-import io.github.hyuwah.catatanku.R;
+    private lateinit var binding: ActivityEditorMarkdownBinding
 
-public class EditorMarkdownActivity extends AppCompatActivity {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        binding = ActivityEditorMarkdownBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        val bundle = intent.extras
+        val mTitle = bundle!!.getString("TITLE")
+        val mBody = bundle.getString("BODY")
 
-  MarkdownView markdownView;
+        // TODO make bundle into variable, handle lifecycle change
 
-  @Override
-  protected void onCreate(Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
-    setContentView(R.layout.activity_editor_markdown);
-
-    markdownView = findViewById(R.id.editor_markdown_view);
-
-    Bundle bundle = getIntent().getExtras();
-    String mTitle = bundle.getString("TITLE");
-    String mBody = bundle.getString("BODY");
-
-    // TODO make bundle into variable, handle lifecycle change
-
-    // TODO Handle Empty view?
-    if(TextUtils.isEmpty(mTitle)){
-      setTitle("Untitled");
-    }else{
-      setTitle(mTitle);
+        // TODO Handle Empty view?
+        title = if (TextUtils.isEmpty(mTitle)) {
+            "Untitled"
+        } else {
+            mTitle
+        }
+        binding.editorMarkdownView.addStyleSheet(Github())
+        binding.editorMarkdownView.loadMarkdown(mBody)
     }
-
-    markdownView.addStyleSheet(new Github());
-    markdownView.loadMarkdown(bundle.getString("BODY"));
-
-  }
 }

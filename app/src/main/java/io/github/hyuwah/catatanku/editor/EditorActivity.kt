@@ -1,385 +1,308 @@
-package io.github.hyuwah.catatanku.editor;
+package io.github.hyuwah.catatanku.editor
 
-import android.app.AlertDialog;
-import android.app.LoaderManager;
-import android.content.ContentValues;
-import android.content.CursorLoader;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.Loader;
-import android.database.Cursor;
-import android.net.Uri;
-import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
-import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.inputmethod.EditorInfo;
-import android.widget.EditText;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.app.AlertDialog
+import android.app.LoaderManager
+import android.content.ContentValues
+import android.content.CursorLoader
+import android.content.DialogInterface
+import android.content.Intent
+import android.content.Loader
+import android.database.Cursor
+import android.net.Uri
+import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
+import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
+import android.view.MotionEvent
+import android.view.View
+import android.view.inputmethod.EditorInfo
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.NavUtils
+import io.github.hyuwah.catatanku.R
+import io.github.hyuwah.catatanku.databinding.ActivityEditorBinding
+import io.github.hyuwah.catatanku.utils.storage.NoteContract
+import java.text.SimpleDateFormat
+import java.util.Arrays
+import java.util.Date
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.NavUtils;
+class EditorActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<Cursor> {
+    private lateinit var binding: ActivityEditorBinding
+    private var currentTitle: String? = null
+    private var currentBody: String? = null
+    private var currentDatetime: Date? = null
+    private var hasChanged = false
+    private var mCurrentNote: Uri? = null
+    val TAG = this.javaClass.simpleName
 
-import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Date;
-
-import io.github.hyuwah.catatanku.R;
-import io.github.hyuwah.catatanku.utils.storage.NoteContract;
-
-public class EditorActivity extends AppCompatActivity implements
-    LoaderManager.LoaderCallbacks<Cursor> {
-
-  //Views
-  EditText etTitle;
-  EditText etBody;
-  TextView tvDatetime;
-  TextView tvStats;
-
-  private String currentTitle;
-  private String currentBody;
-  private Date currentDatetime;
-  private boolean hasChanged;
-
-  private Uri mCurrentNote;
-
-  final String TAG = this.getClass().getSimpleName();
-
-  /**
-   * Lifecycle Override
-   */
-
-  @Override
-  protected void onCreate(Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
-    setContentView(R.layout.activity_editor);
-    setupView();
-
-    mCurrentNote = getIntent().getData();
-
-    if (mCurrentNote == null) {
-      setTitle("Add new note");
-      tvDatetime.setVisibility(View.GONE);
-    } else {
-      setTitle("Edit note");
-      tvDatetime.setVisibility(View.VISIBLE);
-      getLoaderManager().initLoader(1, null, this);
+    /**
+     * Lifecycle Override
+     */
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        binding = ActivityEditorBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        setupView()
+        mCurrentNote = intent.data
+        if (mCurrentNote == null) {
+            title = "Add new note"
+            binding.editorNoteDatetime.visibility = View.GONE
+        } else {
+            title = "Edit note"
+            binding.editorNoteDatetime.visibility = View.VISIBLE
+            loaderManager.initLoader(1, null, this)
+        }
+        hasChanged = false
     }
 
-    hasChanged = false;
-  }
+    /**
+     * Overflow menu related
+     */
+    override fun onPrepareOptionsMenu(menu: Menu): Boolean {
+        super.onPrepareOptionsMenu(menu)
 
-  /**
-   * Overflow menu related
-   */
-
-  @Override
-  public boolean onPrepareOptionsMenu(Menu menu) {
-    super.onPrepareOptionsMenu(menu);
-
-    // Hide delete action if not on edit mode
-    if (mCurrentNote == null) {
-      MenuItem menuItem = menu.findItem(R.id.editor_action_delete);
-      menuItem.setVisible(false);
+        // Hide delete action if not on edit mode
+        if (mCurrentNote == null) {
+            val menuItem = menu.findItem(R.id.editor_action_delete)
+            menuItem.isVisible = false
+        }
+        return true
     }
 
-    return true;
-  }
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.menu_note_editor, menu)
+        return true
+    }
 
-  @Override
-  public boolean onCreateOptionsMenu(Menu menu) {
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.editor_action_markdown -> {
+                val markdownIntent = Intent(this, EditorMarkdownActivity::class.java)
+                // TODO emptyview data disini atau di activity nya?
+                markdownIntent.putExtra("TITLE", binding.editorNoteTitle.text.toString())
+                markdownIntent.putExtra("BODY", binding.editorNoteBody.text.toString())
+                startActivity(markdownIntent)
+                return true
+            }
 
-    getMenuInflater().inflate(R.menu.menu_note_editor, menu);
+            R.id.editor_action_delete -> {
+                showDeleteConfirmationDialog { dialogInterface: DialogInterface?, i: Int -> deleteNote() }
+                return true
+            }
 
-    return true;
-  }
+            R.id.editor_action_clear -> {
+                clearEditor()
+                return true
+            }
 
-  @Override
-  public boolean onOptionsItemSelected(MenuItem item) {
+            R.id.editor_action_save -> {
+                saveNote()
+                return true
+            }
 
-    switch (item.getItemId()) {
+            android.R.id.home -> {
+                var titleChanged = false
+                var bodyChanged = false
+                if (binding.editorNoteTitle.text.toString().trim { it <= ' ' } != currentTitle) {
+                    titleChanged = true
+                }
+                if (binding.editorNoteBody.text.toString().trim { it <= ' ' } != currentBody) {
+                    bodyChanged = true
+                }
 
-      case R.id.editor_action_markdown:
-        Intent markdownIntent = new Intent(this, EditorMarkdownActivity.class);
-        // TODO emptyview data disini atau di activity nya?
-        markdownIntent.putExtra("TITLE", etTitle.getText().toString());
-        markdownIntent.putExtra("BODY", etBody.getText().toString());
-        startActivity(markdownIntent);
-
-        return true;
-
-      case R.id.editor_action_delete:
-        showDeleteConfirmationDialog((dialogInterface, i) -> deleteNote());
-        return true;
-
-      case R.id.editor_action_clear:
-        clearEditor();
-        return true;
-
-      case R.id.editor_action_save:
-        saveNote();
-        return true;
-
-      case android.R.id.home:
-
-        boolean titleChanged = false;
-        boolean bodyChanged = false;
-        if (!etTitle.getText().toString().trim().equals(currentTitle)) {
-          titleChanged = true;
+                //Log.i(TAG, "Title: ("+binding.editorNoteTitle.getText().toString().trim()+") - ("+currentTitle+")");
+                //Log.i(TAG, "Body: ("+binding.editorNoteBody.getText().toString().trim()+") - ("+currentBody+")");
+                Log.i(
+                    TAG,
+                    "titleChanged: " + titleChanged + " - bodyChanged: " + bodyChanged + " = " + (titleChanged || bodyChanged)
+                )
+                if (!titleChanged && !bodyChanged) {
+                    return super.onOptionsItemSelected(item)
+                }
+                showUnsavedChangesDialog { dialogInterface: DialogInterface, i: Int ->
+                    dialogInterface.dismiss()
+                    NavUtils.navigateUpFromSameTask(this@EditorActivity)
+                }
+                return true
+            }
         }
-        if (!etBody.getText().toString().trim().equals(currentBody)) {
-          bodyChanged = true;
+        return super.onOptionsItemSelected(item)
+    }
+
+    /**
+     * Backpress behaviour override
+     */
+    override fun onBackPressed() {
+        var titleChanged = false
+        var bodyChanged = false
+        if (binding.editorNoteTitle.text.toString().trim { it <= ' ' } != currentTitle) {
+            titleChanged = true
+        }
+        if (binding.editorNoteBody.text.toString().trim { it <= ' ' } != currentBody) {
+            bodyChanged = true
         }
 
-        //Log.i(TAG, "Title: ("+etTitle.getText().toString().trim()+") - ("+currentTitle+")");
-        //Log.i(TAG, "Body: ("+etBody.getText().toString().trim()+") - ("+currentBody+")");
-
-        Log.i(TAG, "titleChanged: " + titleChanged + " - bodyChanged: " + bodyChanged + " = " + (
-            titleChanged || bodyChanged));
+        //Log.i(TAG, "Title: ("+binding.editorNoteTitle.getText().toString().trim()+") - ("+currentTitle+")");
+        //Log.i(TAG, "Body: ("+binding.editorNoteBody.getText().toString().trim()+") - ("+currentBody+")");
+        Log.i(
+            TAG,
+            "titleChanged: $titleChanged - bodyChanged: $bodyChanged = " + (titleChanged
+                    || bodyChanged)
+        )
         if (!titleChanged && !bodyChanged) {
-          return super.onOptionsItemSelected(item);
+            super.onBackPressed()
+        } else {
+            showUnsavedChangesDialog { dialogInterface: DialogInterface, i: Int ->
+                dialogInterface.dismiss()
+                super.onBackPressed()
+            }
         }
-        showUnsavedChangesDialog((dialogInterface, i) -> {
-          dialogInterface.dismiss();
-          NavUtils.navigateUpFromSameTask(EditorActivity.this);
-        });
-
-        return true;
     }
 
-    return super.onOptionsItemSelected(item);
-  }
-
-  /**
-   * Backpress behaviour override
-   */
-
-  @Override
-  public void onBackPressed() {
-
-    boolean titleChanged = false;
-    boolean bodyChanged = false;
-    if (!etTitle.getText().toString().trim().equals(currentTitle)) {
-      titleChanged = true;
-    }
-    if (!etBody.getText().toString().trim().equals(currentBody)) {
-      bodyChanged = true;
+    /**
+     * CursorLoader Callbacks
+     */
+    override fun onCreateLoader(i: Int, bundle: Bundle?): Loader<Cursor> {
+        val projection = arrayOf(
+            NoteContract.NotesEntry._ID,
+            NoteContract.NotesEntry.COLUMN_NOTE_TITLE,
+            NoteContract.NotesEntry.COLUMN_NOTE_BODY,
+            NoteContract.NotesEntry.COLUMN_NOTE_DATETIME
+        )
+        return CursorLoader(this, mCurrentNote, projection, null, null, null)
     }
 
-    //Log.i(TAG, "Title: ("+etTitle.getText().toString().trim()+") - ("+currentTitle+")");
-    //Log.i(TAG, "Body: ("+etBody.getText().toString().trim()+") - ("+currentBody+")");
-
-    Log.i(TAG,
-        "titleChanged: " + titleChanged + " - bodyChanged: " + bodyChanged + " = " + (titleChanged
-            || bodyChanged));
-    if (!titleChanged && !bodyChanged) {
-      super.onBackPressed();
-    } else {
-      showUnsavedChangesDialog((dialogInterface, i) -> {
-        dialogInterface.dismiss();
-        super.onBackPressed();
-      });
+    override fun onLoadFinished(loader: Loader<Cursor>, cursor: Cursor) {
+        if (cursor.moveToFirst()) {
+            currentTitle = cursor
+                .getString(cursor.getColumnIndex(NoteContract.NotesEntry.COLUMN_NOTE_TITLE))
+            currentBody = cursor
+                .getString(cursor.getColumnIndex(NoteContract.NotesEntry.COLUMN_NOTE_BODY))
+            currentDatetime = Date(
+                cursor.getLong(cursor.getColumnIndex(NoteContract.NotesEntry.COLUMN_NOTE_DATETIME))
+            )
+            val currentDatetimeString = SimpleDateFormat("HH:mm:ss - EE, dd/MM/yy")
+                .format(currentDatetime)
+            binding.editorNoteTitle.setText(currentTitle)
+            binding.editorNoteBody.setText(currentBody)
+            binding.editorNoteDatetime.text = "Created @ $currentDatetimeString"
+        }
     }
 
-  }
-
-
-  /**
-   * CursorLoader Callbacks
-   */
-
-  @Override
-  public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
-    String[] projection = {
-        NoteContract.NotesEntry._ID,
-        NoteContract.NotesEntry.COLUMN_NOTE_TITLE,
-        NoteContract.NotesEntry.COLUMN_NOTE_BODY,
-        NoteContract.NotesEntry.COLUMN_NOTE_DATETIME
-    };
-    return new CursorLoader(this, mCurrentNote, projection, null, null, null);
-  }
-
-  @Override
-  public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
-    if (cursor.moveToFirst()) {
-      currentTitle = cursor
-          .getString(cursor.getColumnIndex(NoteContract.NotesEntry.COLUMN_NOTE_TITLE));
-      currentBody = cursor
-          .getString(cursor.getColumnIndex(NoteContract.NotesEntry.COLUMN_NOTE_BODY));
-      currentDatetime = new Date(
-          cursor.getLong(cursor.getColumnIndex(NoteContract.NotesEntry.COLUMN_NOTE_DATETIME)));
-      String currentDatetimeString = new SimpleDateFormat("HH:mm:ss - EE, dd/MM/yy")
-          .format(currentDatetime);
-
-      etTitle.setText(currentTitle);
-      etBody.setText(currentBody);
-      tvDatetime.setText("Created @ " + currentDatetimeString);
-
-
-    }
-  }
-
-  @Override
-  public void onLoaderReset(Loader<Cursor> loader) {
-    etTitle.setText("");
-    etBody.setText("");
-
-  }
-
-  /**
-   * Activity Methods
-   */
-
-  public boolean setHasChanged() {
-    hasChanged = true;
-    return false;
-  }
-
-  private void setupView() {
-
-    etTitle = findViewById(R.id.editor_note_title);
-    etBody = findViewById(R.id.editor_note_body);
-    tvDatetime = findViewById(R.id.editor_note_datetime);
-    tvStats = findViewById(R.id.editor_note_stats);
-
-    etTitle.setOnTouchListener((view, motionEvent) -> setHasChanged());
-    etBody.setOnTouchListener((view, motionEvent) -> setHasChanged());
-
-    etTitle.setImeOptions(EditorInfo.IME_ACTION_NEXT);
-    etTitle.setHorizontallyScrolling(false);
-    etTitle.setMaxLines(5);
-
-    currentTitle = "";
-    currentBody = "";
-
-    // Note stats, Body text listener
-    etBody.addTextChangedListener(new TextWatcher() {
-
-      @Override
-      public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-      }
-
-      @Override
-      public void onTextChanged(CharSequence charSequence, int start, int before, int count) {
-        statsCount(charSequence.toString());
-      }
-
-      @Override
-      public void afterTextChanged(Editable editable) {
-
-      }
-    });
-
-  }
-
-  private void clearEditor() {
-
-    if (mCurrentNote != null) {
-      showClearConfirmationDialog((dialogInterface, i) -> {
-        hasChanged = true;
-        etTitle.setText("");
-        etBody.setText("");
-        Toast.makeText(this, "Editor cleared", Toast.LENGTH_SHORT).show();
-      });
-    } else {
-      etTitle.setText("");
-      etBody.setText("");
-      Toast.makeText(this, "Editor cleared", Toast.LENGTH_SHORT).show();
+    override fun onLoaderReset(loader: Loader<Cursor>) {
+        binding.editorNoteTitle.setText("")
+        binding.editorNoteBody.setText("")
     }
 
-  }
-
-  private void saveNote() {
-
-    String title = etTitle.getText().toString().trim();
-    String body = etBody.getText().toString().trim();
-
-    ContentValues values = new ContentValues();
-    values.put(NoteContract.NotesEntry.COLUMN_NOTE_TITLE, title);
-    values.put(NoteContract.NotesEntry.COLUMN_NOTE_BODY, body);
-
-    if (mCurrentNote == null) {
-      // Add new
-      values.put(NoteContract.NotesEntry.COLUMN_NOTE_DATETIME, new Date().getTime());
-
-      Uri newUri = getContentResolver().insert(NoteContract.NotesEntry.CONTENT_URI, values);
-
-      if (newUri != null) {
-        Toast.makeText(this, "Note saved", Toast.LENGTH_SHORT).show();
-      }
-
-    } else {
-      // Edit existing
-      int rowEdited = getContentResolver().update(mCurrentNote, values, null, null);
-      if (rowEdited > 0) {
-        Toast.makeText(this, "Note updated", Toast.LENGTH_SHORT).show();
-      }
+    /**
+     * Activity Methods
+     */
+    fun setHasChanged(): Boolean {
+        hasChanged = true
+        return false
     }
 
-    finish();
-  }
+    private fun setupView() {
+        binding.editorNoteTitle.setOnTouchListener { view: View?, motionEvent: MotionEvent? -> setHasChanged() }
+        binding.editorNoteBody.setOnTouchListener { view: View?, motionEvent: MotionEvent? -> setHasChanged() }
+        binding.editorNoteTitle.imeOptions = EditorInfo.IME_ACTION_NEXT
+        binding.editorNoteTitle.setHorizontallyScrolling(false)
+        binding.editorNoteTitle.maxLines = 5
+        currentTitle = ""
+        currentBody = ""
 
-  private void deleteNote() {
+        // Note stats, Body text listener
+        binding.editorNoteBody.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) {}
+            override fun onTextChanged(
+                charSequence: CharSequence,
+                start: Int,
+                before: Int,
+                count: Int
+            ) {
+                statsCount(charSequence.toString())
+            }
 
-    int rowDeleted = getContentResolver().delete(mCurrentNote, null, null);
-
-    if (rowDeleted > 0) {
-      Toast.makeText(this, "Note deleted", Toast.LENGTH_SHORT).show();
-    }
-
-    finish();
-  }
-
-  private void showUnsavedChangesDialog(DialogInterface.OnClickListener discardClickListener) {
-
-    AlertDialog.Builder builder = new AlertDialog.Builder(this);
-    builder.setMessage("There are unsaved changes!")
-        .setPositiveButton("Keep Editing", (dialogInterface, i) -> {
-          if (dialogInterface != null) {
-            dialogInterface.dismiss();
-          }
+            override fun afterTextChanged(editable: Editable) {}
         })
-        .setNegativeButton("Discard", discardClickListener).show();
-  }
+    }
 
-  private void showClearConfirmationDialog(DialogInterface.OnClickListener clearClickListener) {
+    private fun clearEditor() {
+        if (mCurrentNote != null) {
+            showClearConfirmationDialog { dialogInterface: DialogInterface?, i: Int ->
+                hasChanged = true
+                binding.editorNoteTitle.setText("")
+                binding.editorNoteBody.setText("")
+                Toast.makeText(this, "Editor cleared", Toast.LENGTH_SHORT).show()
+            }
+        } else {
+            binding.editorNoteTitle.setText("")
+            binding.editorNoteBody.setText("")
+            Toast.makeText(this, "Editor cleared", Toast.LENGTH_SHORT).show()
+        }
+    }
 
-    AlertDialog.Builder builder = new AlertDialog.Builder(this);
-    builder.setMessage("This note will be cleared!")
-        .setPositiveButton("Cancel", (dialogInterface, i) -> {
-          if (dialogInterface != null) {
-            dialogInterface.dismiss();
-          }
-        })
-        .setNegativeButton("Continue", clearClickListener).show();
-  }
+    private fun saveNote() {
+        val title = binding.editorNoteTitle.text.toString().trim { it <= ' ' }
+        val body = binding.editorNoteBody.text.toString().trim { it <= ' ' }
+        val values = ContentValues()
+        values.put(NoteContract.NotesEntry.COLUMN_NOTE_TITLE, title)
+        values.put(NoteContract.NotesEntry.COLUMN_NOTE_BODY, body)
+        if (mCurrentNote == null) {
+            // Add new
+            values.put(NoteContract.NotesEntry.COLUMN_NOTE_DATETIME, Date().time)
+            val newUri = contentResolver.insert(NoteContract.NotesEntry.CONTENT_URI, values)
+            if (newUri != null) {
+                Toast.makeText(this, "Note saved", Toast.LENGTH_SHORT).show()
+            }
+        } else {
+            // Edit existing
+            val rowEdited = contentResolver.update(mCurrentNote!!, values, null, null)
+            if (rowEdited > 0) {
+                Toast.makeText(this, "Note updated", Toast.LENGTH_SHORT).show()
+            }
+        }
+        finish()
+    }
 
-  private void showDeleteConfirmationDialog(DialogInterface.OnClickListener deleteClickListener) {
+    private fun deleteNote() {
+        val rowDeleted = contentResolver.delete(mCurrentNote!!, null, null)
+        if (rowDeleted > 0) {
+            Toast.makeText(this, "Note deleted", Toast.LENGTH_SHORT).show()
+        }
+        finish()
+    }
 
-    AlertDialog.Builder builder = new AlertDialog.Builder(this);
-    builder.setMessage("This note will be deleted!")
-        .setPositiveButton("Cancel", (dialogInterface, i) -> {
-          if (dialogInterface != null) {
-            dialogInterface.dismiss();
-          }
-        })
-        .setNegativeButton("Delete", deleteClickListener).show();
-  }
+    private fun showUnsavedChangesDialog(discardClickListener: DialogInterface.OnClickListener) {
+        val builder = AlertDialog.Builder(this)
+        builder.setMessage("There are unsaved changes!")
+            .setPositiveButton("Keep Editing") { dialogInterface: DialogInterface?, i: Int -> dialogInterface?.dismiss() }
+            .setNegativeButton("Discard", discardClickListener).show()
+    }
 
-  // on edit text change
-  private void statsCount(String bodyText) {
-    int charsCount = bodyText.length();
+    private fun showClearConfirmationDialog(clearClickListener: DialogInterface.OnClickListener) {
+        val builder = AlertDialog.Builder(this)
+        builder.setMessage("This note will be cleared!")
+            .setPositiveButton("Cancel") { dialogInterface: DialogInterface?, i: Int -> dialogInterface?.dismiss() }
+            .setNegativeButton("Continue", clearClickListener).show()
+    }
 
-    String[] words = bodyText.split("[\\s\\W]+");
-    Log.i(TAG, "statsCount: " + Arrays.toString(words));
-    int wordsCount = bodyText.isEmpty() ? 0 : words.length;
+    private fun showDeleteConfirmationDialog(deleteClickListener: DialogInterface.OnClickListener) {
+        val builder = AlertDialog.Builder(this)
+        builder.setMessage("This note will be deleted!")
+            .setPositiveButton("Cancel") { dialogInterface: DialogInterface?, i: Int -> dialogInterface?.dismiss() }
+            .setNegativeButton("Delete", deleteClickListener).show()
+    }
 
-    tvStats.setText(charsCount + " Chars " + wordsCount + " Words");
-
-  }
+    // on edit text change
+    private fun statsCount(bodyText: String) {
+        val charsCount = bodyText.length
+        val words =
+            bodyText.split("[\\s\\W]+".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+        Log.i(TAG, "statsCount: " + Arrays.toString(words))
+        val wordsCount = if (bodyText.isEmpty()) 0 else words.size
+        binding.editorNoteStats.text = "$charsCount Chars $wordsCount Words"
+    }
 }
