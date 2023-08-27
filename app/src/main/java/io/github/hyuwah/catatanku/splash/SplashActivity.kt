@@ -1,36 +1,33 @@
-package io.github.hyuwah.catatanku.splash;
+package io.github.hyuwah.catatanku.splash
 
-import android.content.Intent;
-import androidx.appcompat.app.AppCompatActivity;
-import android.os.Bundle;
+import android.content.Intent
+import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
+import io.github.hyuwah.catatanku.R
+import io.github.hyuwah.catatanku.databinding.ActivitySplashBinding
+import io.github.hyuwah.catatanku.notelist.NoteListActivity
 
-import io.github.hyuwah.catatanku.R;
-import io.github.hyuwah.catatanku.notelist.NoteListActivity;
+class SplashActivity : AppCompatActivity() {
 
-public class SplashActivity extends AppCompatActivity {
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_splash);
-
-        final Intent intent = new Intent(this, NoteListActivity.class);
+    private lateinit var binding: ActivitySplashBinding
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        binding = ActivitySplashBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         // Delayed 2s to Main Activity
-        Thread launch = new Thread(){
-            @Override
-            public void run() {
-                try{
-                    sleep(2000);
-                }catch (InterruptedException e){
-                    e.printStackTrace();
-                }finally {
-                    startActivity(intent);
-                    finish();
+        val launch: Thread = object : Thread() {
+            override fun run() {
+                try {
+                    sleep(2000)
+                } catch (e: InterruptedException) {
+                    e.printStackTrace()
+                } finally {
+                    startActivity(Intent(this@SplashActivity, NoteListActivity::class.java))
+                    finish()
                 }
             }
-        };
-
-        launch.start();
+        }
+        launch.start()
     }
 }
