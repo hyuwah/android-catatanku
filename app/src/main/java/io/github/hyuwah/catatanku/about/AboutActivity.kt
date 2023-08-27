@@ -1,68 +1,64 @@
-package io.github.hyuwah.catatanku.about;
+package io.github.hyuwah.catatanku.about
 
-import android.content.Context;
-import android.content.SharedPreferences;
-import androidx.appcompat.app.AppCompatActivity;
-import android.os.Bundle;
-import android.view.Gravity;
-import android.view.View;
-import android.widget.Toast;
+import android.content.SharedPreferences
+import android.os.Bundle
+import android.view.Gravity
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.edit
+import io.github.hyuwah.catatanku.BuildConfig
+import io.github.hyuwah.catatanku.R
+import mehdi.sakout.aboutpage.AboutPage
+import mehdi.sakout.aboutpage.Element
+import java.util.Calendar
 
-import io.github.hyuwah.catatanku.R;
-import java.util.Calendar;
+class AboutActivity : AppCompatActivity() {
 
-import mehdi.sakout.aboutpage.AboutPage;
-import mehdi.sakout.aboutpage.Element;
+    private val sharedPref: SharedPreferences by lazy {
+        getSharedPreferences(getString(R.string.pref_file_key), MODE_PRIVATE)
+    }
 
-public class AboutActivity extends AppCompatActivity {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        val aboutPage = AboutPage(this)
+            .isRTL(false)
+            .setImage(R.mipmap.ic_launcher)
+            .setDescription("CatatanKu\nSimple note-taking apps")
+            .addItem(versionElement)
+            .addGroup("Connect with developer")
+            .addEmail("muhammad.whydn@gmail.com", "Contact developer")
+            .addWebsite("http://hyuwah.github.io/", "Visit developer website")
+            .addGitHub("hyuwah", "Check other projects on Github")
+            .addItem(copyRightsElement)
+            .create()
+        setContentView(aboutPage)
+    }
 
-  SharedPreferences sharedPref;
-  SharedPreferences.Editor editor;
+    private val versionElement = Element().apply {
+        title = "Version ${BuildConfig.VERSION_NAME}"
+        setOnClickListener {
+            toggleDebugMode()
+        }
+    }
 
+    private val copyRightsElement = Element().apply {
+        title = "Copyrights © ${Calendar.getInstance()[Calendar.YEAR]}"
+        // setIconDrawable(R.drawable.about_icon_copy_right);
+        iconTint = mehdi.sakout.aboutpage.R.color.about_item_icon_color
+        iconNightTint = android.R.color.white
+        gravity = Gravity.CENTER
+    }
 
-  @Override
-  protected void onCreate(Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
-
-    sharedPref = getBaseContext().getSharedPreferences(
-        getString(R.string.pref_file_key), Context.MODE_PRIVATE);
-    editor = sharedPref.edit();
-
-    View aboutPage = new AboutPage(this)
-        .isRTL(false)
-        .setImage(R.mipmap.ic_launcher)
-        .setDescription("CatatanKu\nSimple note-taking apps")
-        .addItem(new Element().setTitle("Version 1.0").setOnClickListener(view -> {
-          boolean debugToggle = sharedPref.getBoolean(getString(R.string.pref_key_isdebug), false);
-
-          editor.putBoolean(getString(R.string.pref_key_isdebug), !debugToggle);
-          editor.commit();
-
-          Toast.makeText(getBaseContext(),
-              "Debug Mode: " + (!debugToggle ? "Activated" : "Deactivated"), Toast.LENGTH_SHORT)
-              .show();
-        }))
-        .addGroup("Connect with developer")
-        .addEmail("muhammad.whydn@gmail.com", "Contact developer")
-        .addWebsite("http://hyuwah.github.io/", "Visit developer website")
-        .addGitHub("hyuwah", "Check other projects on Github")
-        .addItem(getCopyRightsElement())
-        .create();
-
-    setContentView(aboutPage);
-  }
-
-  Element getCopyRightsElement() {
-    Element copyRightsElement = new Element();
-    final String copyrights = String
-        .format("Copyrights © %1$d", Calendar.getInstance().get(Calendar.YEAR));
-    copyRightsElement.setTitle(copyrights);
-//        copyRightsElement.setIconDrawable(R.drawable.about_icon_copy_right);
-    copyRightsElement.setIconTint(mehdi.sakout.aboutpage.R.color.about_item_icon_color);
-    copyRightsElement.setIconNightTint(android.R.color.white);
-    copyRightsElement.setGravity(Gravity.CENTER);
-    copyRightsElement.setOnClickListener(
-        v -> Toast.makeText(AboutActivity.this, "Muhammad Wahyudin", Toast.LENGTH_SHORT).show());
-    return copyRightsElement;
-  }
+    private fun toggleDebugMode() {
+        val debugToggle = sharedPref.getBoolean(getString(R.string.pref_key_isdebug), false)
+        sharedPref.edit {
+            putBoolean(getString(R.string.pref_key_isdebug), !debugToggle)
+            apply()
+        }
+        Toast.makeText(
+            this,
+            "Debug Mode: " + if (!debugToggle) "Activated" else "Deactivated",
+            Toast.LENGTH_SHORT
+        ).show()
+    }
 }
