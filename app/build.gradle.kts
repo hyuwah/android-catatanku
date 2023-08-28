@@ -78,9 +78,13 @@ dependencies {
     implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.browser)
 
-    // KTX
     implementation(libs.core.ktx)
     implementation(libs.material)
+
+    implementation(libs.bundles.room)
+    kapt(libs.room.compiler)
+
+    implementation(libs.bundles.coroutines)
 
     implementation(libs.android.about.page)
     implementation(libs.markdownview)
