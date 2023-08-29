@@ -82,6 +82,8 @@ dependencies {
     implementation(libs.core.ktx)
     implementation(libs.material)
 
+    implementation(libs.bundles.lifecycle)
+
     implementation(libs.hilt.android)
     kapt(libs.hilt.android.compiler)
 

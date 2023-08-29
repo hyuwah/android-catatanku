@@ -45,9 +45,8 @@ android-multidex = { module = "androidx.multidex:multidex", version.ref = "andro
 core-ktx = { module = "androidx.core:core-ktx", version.ref = "core-ktx" }
 
 lifecycle-runtime-ktx = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "lifecycle" }
-lifecycle-viewmodel = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "lifecycle" }
-lifecycle-livedata = { module = "androidx.lifecycle:lifecycle-livedata-ktx", version.ref = "lifecycle" }
-lifecycle-compiler = { module = "androidx.lifecycle:lifecycle-compiler", version.ref = "lifecycle" }
+lifecycle-viewmodel-ktx = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "lifecycle" }
+lifecycle-livedata-ktx = { module = "androidx.lifecycle:lifecycle-livedata-ktx", version.ref = "lifecycle" }
 lifecycle-java8 = { module = "androidx.lifecycle:lifecycle-common-java8", version.ref = "lifecycle" }
 
 room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
@@ -72,5 +71,5 @@ ksp = { id = "com.google.devtools.ksp", version.ref = "ksp"}
 
 [bundles]
 coroutines = ["coroutine-core", "coroutine-android"]
-lifecycle = ["lifecycle-viewmodel", "lifecycle-livedata", "lifecycle-runtime-ktx", "lifecycle-java8"]
+lifecycle = ["lifecycle-viewmodel-ktx", "lifecycle-livedata-ktx", "lifecycle-runtime-ktx", "lifecycle-java8"]
 room = ["room-runtime", "room-ktx"]
