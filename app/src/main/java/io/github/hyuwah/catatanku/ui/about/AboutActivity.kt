@@ -1,4 +1,4 @@
-package io.github.hyuwah.catatanku.about
+package io.github.hyuwah.catatanku.ui.about
 
 import android.content.SharedPreferences
 import android.os.Bundle

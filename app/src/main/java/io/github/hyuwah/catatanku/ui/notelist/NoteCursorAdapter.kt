@@ -1,4 +1,4 @@
-package io.github.hyuwah.catatanku.notelist
+package io.github.hyuwah.catatanku.ui.notelist
 
 import android.content.Context
 import android.database.Cursor
@@ -8,7 +8,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.CursorAdapter
-import android.widget.TextView
 import io.github.hyuwah.catatanku.R
 import io.github.hyuwah.catatanku.databinding.ItemNoteListBinding
 import io.github.hyuwah.catatanku.utils.storage.NoteContract

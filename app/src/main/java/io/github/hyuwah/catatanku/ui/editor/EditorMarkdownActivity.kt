@@ -1,11 +1,9 @@
-package io.github.hyuwah.catatanku.editor
+package io.github.hyuwah.catatanku.ui.editor
 
 import android.os.Bundle
 import android.text.TextUtils
 import androidx.appcompat.app.AppCompatActivity
-import br.tiagohm.markdownview.MarkdownView
 import br.tiagohm.markdownview.css.styles.Github
-import io.github.hyuwah.catatanku.R
 import io.github.hyuwah.catatanku.databinding.ActivityEditorMarkdownBinding
 
 class EditorMarkdownActivity : AppCompatActivity() {

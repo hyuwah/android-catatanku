@@ -1,4 +1,4 @@
-package io.github.hyuwah.catatanku.editor
+package io.github.hyuwah.catatanku.ui.editor
 
 import android.app.AlertDialog
 import android.app.LoaderManager

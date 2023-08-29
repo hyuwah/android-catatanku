@@ -10,7 +10,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".notelist.NoteListActivity"
+            android:name=".ui.notelist.NoteListActivity"
             android:exported="false"
             android:launchMode="singleTop"
             android:theme="@style/AppTheme">
@@ -23,9 +23,9 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".editor.EditorActivity"
+            android:name=".ui.editor.EditorActivity"
             android:exported="false"
-            android:parentActivityName=".notelist.NoteListActivity" />
+            android:parentActivityName=".ui.notelist.NoteListActivity" />
 
         <provider
             android:name=".utils.storage.NoteProvider"
@@ -34,7 +34,7 @@
             android:exported="false" />
 
         <activity
-            android:name=".splash.SplashActivity"
+            android:name=".ui.splash.SplashActivity"
             android:exported="true"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
@@ -44,12 +44,12 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".about.AboutActivity"
+            android:name=".ui.about.AboutActivity"
             android:exported="false"
             android:label="About"
-            android:parentActivityName=".notelist.NoteListActivity" />
+            android:parentActivityName=".ui.notelist.NoteListActivity" />
         <activity
-            android:name=".editor.EditorMarkdownActivity"
+            android:name=".ui.editor.EditorMarkdownActivity"
             android:exported="false" />
     </application>
 

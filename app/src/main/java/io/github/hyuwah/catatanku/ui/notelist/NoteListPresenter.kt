@@ -1,21 +1,20 @@
-package io.github.hyuwah.catatanku.notelist
+package io.github.hyuwah.catatanku.ui.notelist
 
 import android.app.LoaderManager
 import android.content.ContentUris
 import android.content.ContentValues
-import android.content.Context
 import android.content.CursorLoader
 import android.content.Loader
 import android.database.Cursor
 import android.os.Bundle
 import android.util.Log
-import io.github.hyuwah.catatanku.notelist.NoteListContract.Presenter
+import io.github.hyuwah.catatanku.ui.notelist.NoteListContract.Presenter
 import io.github.hyuwah.catatanku.utils.storage.NoteContract
 import java.util.Date
 import kotlin.math.floor
 
 class NoteListPresenter(
-    private val mLoaderManager: LoaderManager, 
+    private val mLoaderManager: LoaderManager,
     private val noteCursorAdapter: NoteCursorAdapter,
     private val mView: NoteListContract.View
 ) : Presenter, LoaderManager.LoaderCallbacks<Cursor> {

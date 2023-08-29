@@ -1,4 +1,4 @@
-package io.github.hyuwah.catatanku.notelist
+package io.github.hyuwah.catatanku.ui.notelist
 
 import android.app.Activity
 import android.app.AlertDialog
@@ -23,9 +23,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.content.ContextCompat
 import io.github.hyuwah.catatanku.R
-import io.github.hyuwah.catatanku.about.AboutActivity
+import io.github.hyuwah.catatanku.ui.about.AboutActivity
 import io.github.hyuwah.catatanku.databinding.ActivityNoteListBinding
-import io.github.hyuwah.catatanku.editor.EditorActivity
+import io.github.hyuwah.catatanku.ui.editor.EditorActivity
 import io.github.hyuwah.catatanku.utils.chrome.CustomTabActivityHelper
 import io.github.hyuwah.catatanku.utils.storage.NoteContract
 

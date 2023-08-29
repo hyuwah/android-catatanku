@@ -1,11 +1,10 @@
-package io.github.hyuwah.catatanku.splash
+package io.github.hyuwah.catatanku.ui.splash
 
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import io.github.hyuwah.catatanku.R
 import io.github.hyuwah.catatanku.databinding.ActivitySplashBinding
-import io.github.hyuwah.catatanku.notelist.NoteListActivity
+import io.github.hyuwah.catatanku.ui.notelist.NoteListActivity
 
 class SplashActivity : AppCompatActivity() {
 

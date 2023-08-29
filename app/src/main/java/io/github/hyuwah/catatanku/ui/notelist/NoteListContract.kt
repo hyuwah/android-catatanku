@@ -1,9 +1,9 @@
-package io.github.hyuwah.catatanku.notelist
+package io.github.hyuwah.catatanku.ui.notelist
 
 import android.content.Context
 import android.content.DialogInterface
-import io.github.hyuwah.catatanku.BasePresenter
-import io.github.hyuwah.catatanku.BaseView
+import io.github.hyuwah.catatanku.ui.BasePresenter
+import io.github.hyuwah.catatanku.ui.BaseView
 
 interface NoteListContract {
     interface View : BaseView<Presenter> {
