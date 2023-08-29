@@ -7,6 +7,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.kapt)
     alias(libs.plugins.kotlin.parcelize)
+    alias(libs.plugins.hilt.gradle)
 }
 
 // [1][0][0][00] ... [9+][9][9][99]
@@ -80,6 +81,9 @@ dependencies {
 
     implementation(libs.core.ktx)
     implementation(libs.material)
+
+    implementation(libs.hilt.android)
+    kapt(libs.hilt.android.compiler)
 
     implementation(libs.bundles.room)
     kapt(libs.room.compiler)
