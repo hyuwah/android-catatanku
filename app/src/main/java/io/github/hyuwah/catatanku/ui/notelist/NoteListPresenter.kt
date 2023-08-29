@@ -37,6 +37,7 @@ class NoteListPresenter(
     }
 
     override fun onLoadFinished(loader: Loader<Cursor>, data: Cursor) {
+
         noteCursorAdapter.swapCursor(data)
     }
 
