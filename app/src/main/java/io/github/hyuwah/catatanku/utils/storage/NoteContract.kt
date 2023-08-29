@@ -1,48 +1,42 @@
-package io.github.hyuwah.catatanku.utils.storage;
+package io.github.hyuwah.catatanku.utils.storage
 
-import android.content.ContentResolver;
-import android.net.Uri;
-import android.provider.BaseColumns;
+import android.content.ContentResolver
+import android.net.Uri
+import android.provider.BaseColumns
 
 /**
  * Created by hyuwah on 26/01/18.
  */
-
-public final class NoteContract {
-
-    public NoteContract() {
-    }
-
-    public static final String CONTENT_AUTHORITY = "io.github.hyuwah.catatanku";
-    public static final Uri BASE_CONTENT_URI = Uri.parse("content://" + CONTENT_AUTHORITY);
-
-    public static final String PATH_NOTES = "notes";
+object NoteContract {
+    const val CONTENT_AUTHORITY = "io.github.hyuwah.catatanku"
+    val BASE_CONTENT_URI: Uri = Uri.parse("content://$CONTENT_AUTHORITY")
+    const val PATH_NOTES = "notes"
 
     //Table Notes
-    public static abstract class NotesEntry implements BaseColumns {
-
-        public static final String TABLE_NAME = "notes";
-        public static final String _ID = BaseColumns._ID;
-        public static final String COLUMN_NOTE_TITLE = "title";
-        public static final String COLUMN_NOTE_BODY = "body";
-        public static final String COLUMN_NOTE_DATETIME = "datetime";
+    object NotesEntry : BaseColumns {
+        const val TABLE_NAME = "notes"
+        const val _ID = BaseColumns._ID
+        const val COLUMN_NOTE_TITLE = "title"
+        const val COLUMN_NOTE_BODY = "body"
+        const val COLUMN_NOTE_DATETIME = "datetime"
 
         // Query Constant
-        public static final String[] DEFAULT_PROJECTION = {
-                _ID,
-                COLUMN_NOTE_TITLE,
-                COLUMN_NOTE_BODY,
-                COLUMN_NOTE_DATETIME
-        };
-
-        public static final String SORT_TIME_DESC = COLUMN_NOTE_DATETIME+" DESC";
-        public static final String SORT_TIME_ASC = COLUMN_NOTE_DATETIME+" ASC";
+        val DEFAULT_PROJECTION = arrayOf(
+            _ID,
+            COLUMN_NOTE_TITLE,
+            COLUMN_NOTE_BODY,
+            COLUMN_NOTE_DATETIME
+        )
+        const val SORT_TIME_DESC = "$COLUMN_NOTE_DATETIME DESC"
+        const val SORT_TIME_ASC = "$COLUMN_NOTE_DATETIME ASC"
 
         // Content Type
-        public static final String CONTENT_LIST_TYPE = ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_NOTES;
-        public static final String CONTENT_ITEM_TYPE = ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_NOTES;
+        const val CONTENT_LIST_TYPE =
+            ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_NOTES
+        const val CONTENT_ITEM_TYPE =
+            ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_NOTES
 
         // URI
-        public static final Uri CONTENT_URI = Uri.withAppendedPath(BASE_CONTENT_URI, PATH_NOTES);
+        val CONTENT_URI: Uri = Uri.withAppendedPath(BASE_CONTENT_URI, PATH_NOTES)
     }
 }

@@ -1,200 +1,174 @@
-package io.github.hyuwah.catatanku.utils.storage;
+package io.github.hyuwah.catatanku.utils.storage
 
-import android.content.ContentProvider;
-import android.content.ContentUris;
-import android.content.ContentValues;
-import android.content.UriMatcher;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import android.net.Uri;
-import android.util.Log;
+import android.content.ContentProvider
+import android.content.ContentUris
+import android.content.ContentValues
+import android.content.UriMatcher
+import android.database.Cursor
+import android.net.Uri
+import android.util.Log
 
-public class NoteProvider extends ContentProvider {
+class NoteProvider : ContentProvider() {
 
-    public static final String TAG = NoteProvider.class.getSimpleName();
+    private lateinit var mDbHelper: CatatanKuDbHelper
 
-    private CatatanKuDbHelper mDbHelper;
-
-    private static final int NOTES = 100;
-    private static final int NOTE_ID = 101;
-
-    /**
-     * Set URI Matcher
-     */
-    private static final UriMatcher sUriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
-
-    static {
-        sUriMatcher.addURI(NoteContract.CONTENT_AUTHORITY, NoteContract.PATH_NOTES, NOTES);
-        sUriMatcher.addURI(NoteContract.CONTENT_AUTHORITY, NoteContract.PATH_NOTES + "/#", NOTE_ID);
+    override fun onCreate(): Boolean {
+        mDbHelper = CatatanKuDbHelper(context)
+        return true
     }
-
-    // Mandatory empty constructor
-    public NoteProvider() {
-    }
-
-    @Override
-    public int delete(Uri uri, String selection, String[] selectionArgs) {
-        SQLiteDatabase db = mDbHelper.getWritableDatabase();
-
-        final int match = sUriMatcher.match(uri);
-        switch (match) {
-            case NOTES:
-                int rowsDeleted = db.delete(NoteContract.NotesEntry.TABLE_NAME, selection, selectionArgs);
-                if(rowsDeleted!=0){
-                    getContext().getContentResolver().notifyChange(uri,null);
+    override fun delete(uri: Uri, selection: String?, selectionArgs: Array<String>?): Int {
+        var selection = selection
+        var selectionArgs = selectionArgs
+        val db = mDbHelper.writableDatabase
+        return when (val match = sUriMatcher.match(uri)) {
+            NOTES -> {
+                val rowsDeleted = db.delete(NoteContract.NotesEntry.TABLE_NAME, selection, selectionArgs)
+                if (rowsDeleted != 0) {
+                    context?.contentResolver?.notifyChange(uri, null)
                 }
-                return rowsDeleted;
-            case NOTE_ID:
-                selection = NoteContract.NotesEntry._ID + "=?";
-                selectionArgs = new String[]{String.valueOf(ContentUris.parseId(uri))};
-                int specificRowsDeleted = db.delete(NoteContract.NotesEntry.TABLE_NAME,selection,selectionArgs);
-                if(specificRowsDeleted!=0){
-                    getContext().getContentResolver().notifyChange(uri,null);
-                }
-                return specificRowsDeleted;
-            default:
-                throw new IllegalArgumentException("Unknown URI " + uri + " with match " + match);
-        }
-    }
-
-    @Override
-    public String getType(Uri uri) {
-
-        final int match = sUriMatcher.match(uri);
-        switch (match) {
-            case NOTES:
-                return NoteContract.NotesEntry.CONTENT_LIST_TYPE;
-            case NOTE_ID:
-                return NoteContract.NotesEntry.CONTENT_ITEM_TYPE;
-            default:
-                throw new IllegalArgumentException("Unknown URI " + uri + " with match " + match);
-        }
-    }
-
-    @Override
-    public Uri insert(Uri uri, ContentValues values) {
-       final int match = sUriMatcher.match(uri);
-        switch (match) {
-            case NOTES:
-                return insertNote(uri, values);
-            default:
-                throw new IllegalArgumentException("Insert is not supported for " + uri);
-        }
-    }
-
-    @Override
-    public boolean onCreate() {
-        Log.i(TAG, "onCreate: will instantiate mDbHelper");
-        mDbHelper = new CatatanKuDbHelper(getContext());
-        return true;
-    }
-
-    @Override
-    public Cursor query(Uri uri, String[] projection, String selection,
-                        String[] selectionArgs, String sortOrder) {
-
-        Log.i(TAG, "query: will getReadableDatabase");
-        SQLiteDatabase db = mDbHelper.getReadableDatabase();
-        Log.i(TAG, "query: had getReadableDatabase");
-        Cursor cursor;
-
-        int match = sUriMatcher.match(uri);
-        switch (match) {
-            case NOTES:
-                Log.i(TAG, "query: case Notes");
-                cursor = db.query(NoteContract.NotesEntry.TABLE_NAME,
-                        projection,
-                        selection,
-                        selectionArgs,
-                        null,
-                        null,
-                        sortOrder);
-                Log.i(TAG, "query: has assigned cursor");
-                break;
-            case NOTE_ID:
-                selection = NoteContract.NotesEntry._ID + "=?";
-                selectionArgs = new String[]{String.valueOf(ContentUris.parseId(uri))};
-                cursor = db.query(NoteContract.NotesEntry.TABLE_NAME,
-                        projection,
-                        selection,
-                        selectionArgs,
-                        null,
-                        null,
-                        sortOrder);
-                break;
-            default:
-                throw new IllegalArgumentException("Cannot query unknown URI " + uri);
-
-        }
-        cursor.setNotificationUri(getContext().getContentResolver(), uri);
-
-        return cursor;
-    }
-
-    @Override
-    public int update(Uri uri, ContentValues values, String selection,
-                      String[] selectionArgs) {
-        final int match = sUriMatcher.match(uri);
-        switch (match) {
-            case NOTES:
-                return updateNote(uri, values, selection, selectionArgs);
-            case NOTE_ID:
-                selection= NoteContract.NotesEntry._ID+"=?";
-                selectionArgs = new String[]{String.valueOf(ContentUris.parseId(uri))};
-
-                return updateNote(uri, values, selection, selectionArgs);
-            default:
-                throw new IllegalArgumentException("Update is not supported for "+uri);
-        }
-    }
-
-    /**
-     * METHOD Insert, Update, Delete dengan data validation sesuai kebutuhan
-     */
-
-    private Uri insertNote(Uri uri, ContentValues values){
-        String title = values.getAsString(NoteContract.NotesEntry.COLUMN_NOTE_TITLE);
-        String body = values.getAsString(NoteContract.NotesEntry.COLUMN_NOTE_BODY);
-        if(body==null){
-            throw new IllegalArgumentException("Note requires body");
-        }
-
-        long datetime = values.getAsLong(NoteContract.NotesEntry.COLUMN_NOTE_DATETIME);
-
-        SQLiteDatabase db = mDbHelper.getWritableDatabase();
-
-        long id = db.insert(NoteContract.NotesEntry.TABLE_NAME, null, values);
-        if(id==-1){
-            Log.e(TAG, "Failed to insert row for "+uri );
-            return null;
-        }
-
-        getContext().getContentResolver().notifyChange(uri,null);
-        return ContentUris.withAppendedId(uri,id);
-    }
-
-
-    private int updateNote(Uri uri, ContentValues values, String selection, String[] selectionArgs){
-        if(values.containsKey(NoteContract.NotesEntry.COLUMN_NOTE_BODY)){
-            String body = values.getAsString(NoteContract.NotesEntry.COLUMN_NOTE_BODY);
-            if(body==null){
-                throw new IllegalArgumentException("Note requires body");
+                rowsDeleted
             }
+
+            NOTE_ID -> {
+                selection = NoteContract.NotesEntry._ID + "=?"
+                selectionArgs = arrayOf(ContentUris.parseId(uri).toString())
+                val specificRowsDeleted = db.delete(NoteContract.NotesEntry.TABLE_NAME, selection, selectionArgs)
+                if (specificRowsDeleted != 0) {
+                    context?.contentResolver?.notifyChange(uri, null)
+                }
+                specificRowsDeleted
+            }
+
+            else -> throw IllegalArgumentException("Unknown URI $uri with match $match")
         }
-
-        if(values.size()==0){
-            return 0;
-        }
-
-        SQLiteDatabase db = mDbHelper.getWritableDatabase();
-
-        int rowsUpdated = db.update(NoteContract.NotesEntry.TABLE_NAME, values, selection, selectionArgs);
-        if(rowsUpdated!=0){
-            getContext().getContentResolver().notifyChange(uri,null);
-        }
-
-        return rowsUpdated;
-
     }
 
+    override fun getType(uri: Uri): String {
+        return when (val match = sUriMatcher.match(uri)) {
+            NOTES -> NoteContract.NotesEntry.CONTENT_LIST_TYPE
+            NOTE_ID -> NoteContract.NotesEntry.CONTENT_ITEM_TYPE
+            else -> throw IllegalArgumentException("Unknown URI $uri with match $match")
+        }
+    }
+
+    override fun insert(uri: Uri, values: ContentValues?): Uri? {
+        return when (sUriMatcher.match(uri)) {
+            NOTES -> insertNote(uri, values)
+            else -> throw IllegalArgumentException("Insert is not supported for $uri")
+        }
+    }
+
+    override fun query(
+        uri: Uri, projection: Array<String>?, selection: String?,
+        selectionArgs: Array<String>?, sortOrder: String?
+    ): Cursor? {
+        var selection = selection
+        var selectionArgs = selectionArgs
+        val db = mDbHelper.readableDatabase
+        val cursor: Cursor
+        when (sUriMatcher.match(uri)) {
+            NOTES -> {
+                Log.i(TAG, "query: case Notes")
+                cursor = db.query(
+                    NoteContract.NotesEntry.TABLE_NAME,
+                    projection,
+                    selection,
+                    selectionArgs,
+                    null,
+                    null,
+                    sortOrder
+                )
+                Log.i(TAG, "query: has assigned cursor")
+            }
+
+            NOTE_ID -> {
+                selection = NoteContract.NotesEntry._ID + "=?"
+                selectionArgs = arrayOf(ContentUris.parseId(uri).toString())
+                cursor = db.query(
+                    NoteContract.NotesEntry.TABLE_NAME,
+                    projection,
+                    selection,
+                    selectionArgs,
+                    null,
+                    null,
+                    sortOrder
+                )
+            }
+
+            else -> throw IllegalArgumentException("Cannot query unknown URI $uri")
+        }
+        cursor.setNotificationUri(context!!.contentResolver, uri)
+        return cursor
+    }
+
+    override fun update(
+        uri: Uri, values: ContentValues?, selection: String?,
+        selectionArgs: Array<String>?
+    ): Int {
+        var selection = selection
+        var selectionArgs = selectionArgs
+        return when (sUriMatcher.match(uri)) {
+            NOTES -> updateNote(uri, values, selection, selectionArgs)
+            NOTE_ID -> {
+                selection = NoteContract.NotesEntry._ID + "=?"
+                selectionArgs = arrayOf(ContentUris.parseId(uri).toString())
+                updateNote(uri, values, selection, selectionArgs)
+            }
+
+            else -> throw IllegalArgumentException("Update is not supported for $uri")
+        }
+    }
+
+    private fun insertNote(
+        uri: Uri,
+        values: ContentValues?
+    ): Uri? {
+        values?.getAsString(NoteContract.NotesEntry.COLUMN_NOTE_BODY)
+            ?: throw IllegalArgumentException("Note requires body")
+        val db = mDbHelper.writableDatabase
+        val id = db.insert(NoteContract.NotesEntry.TABLE_NAME, null, values)
+        if (id == -1L) {
+            Log.e(TAG, "Failed to insert row for $uri")
+            return null
+        }
+        context?.contentResolver?.notifyChange(uri, null)
+        return ContentUris.withAppendedId(uri, id)
+    }
+
+    private fun updateNote(
+        uri: Uri,
+        values: ContentValues?,
+        selection: String?,
+        selectionArgs: Array<String>?
+    ): Int {
+        if (values?.containsKey(NoteContract.NotesEntry.COLUMN_NOTE_BODY) == true) {
+            values.getAsString(NoteContract.NotesEntry.COLUMN_NOTE_BODY)
+                ?: throw IllegalArgumentException("Note requires body")
+        }
+        if (values?.size() == 0) {
+            return 0
+        }
+        val db = mDbHelper.writableDatabase
+        val rowsUpdated = db.update(
+            NoteContract.NotesEntry.TABLE_NAME, values, selection, selectionArgs
+        )
+        if (rowsUpdated != 0) {
+            context?.contentResolver?.notifyChange(uri, null)
+        }
+        return rowsUpdated
+    }
+
+    companion object {
+        val TAG = NoteProvider::class.java.simpleName
+        private const val NOTES = 100
+        private const val NOTE_ID = 101
+
+        /**
+         * Set URI Matcher
+         */
+        private val sUriMatcher = UriMatcher(UriMatcher.NO_MATCH).apply {
+            addURI(NoteContract.CONTENT_AUTHORITY, NoteContract.PATH_NOTES, NOTES)
+            addURI(NoteContract.CONTENT_AUTHORITY, "${NoteContract.PATH_NOTES}/#", NOTE_ID)
+        }
+    }
 }
