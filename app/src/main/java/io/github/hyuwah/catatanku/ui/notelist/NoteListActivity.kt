@@ -3,61 +3,53 @@ package io.github.hyuwah.catatanku.ui.notelist
 import android.app.Activity
 import android.app.AlertDialog
 import android.app.SearchManager
-import android.content.ContentUris
-import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.view.ActionMode
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
-import android.widget.AbsListView.MultiChoiceModeListener
-import android.widget.AdapterView
-import android.widget.AdapterView.OnItemClickListener
-import android.widget.ListView
 import android.widget.SearchView
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
+import dagger.hilt.android.AndroidEntryPoint
 import io.github.hyuwah.catatanku.R
-import io.github.hyuwah.catatanku.ui.about.AboutActivity
 import io.github.hyuwah.catatanku.databinding.ActivityNoteListBinding
+import io.github.hyuwah.catatanku.domain.model.Note
+import io.github.hyuwah.catatanku.ui.about.AboutActivity
 import io.github.hyuwah.catatanku.ui.editor.EditorActivity
 import io.github.hyuwah.catatanku.utils.chrome.CustomTabActivityHelper
-import io.github.hyuwah.catatanku.utils.storage.NoteContract
 
-class NoteListActivity : AppCompatActivity(), NoteListContract.View {
+@AndroidEntryPoint
+class NoteListActivity : AppCompatActivity(), NotesAdapter.NoteItemListener {
     
     private lateinit var binding: ActivityNoteListBinding
-    
-    // Views
-    private var mPresenter: NoteListPresenter? = null
+
+    private val viewModel: NoteListViewModel by viewModels()
+
     private var mBackPressed: Long = 0
-    
-    private val noteCursorAdapter by lazy {
-        NoteCursorAdapter(this, null)
+
+    private val notesAdapter by lazy {
+        NotesAdapter(noteItemListener = this)
     }
+
     private val sharedPref by lazy {
         getSharedPreferences(getString(R.string.pref_file_key), MODE_PRIVATE)
     }
 
-    /**
-     * Lifecycle Override
-     */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityNoteListBinding.inflate(layoutInflater)
         setContentView(binding.root)
         
-        binding.fab.setOnClickListener { _: View? ->
-            val intent = Intent(this, EditorActivity::class.java)
-            startActivity(intent)
+        binding.fab.setOnClickListener {
+            startActivity(Intent(this, EditorActivity::class.java))
         }
-        prepareListView()
-        mPresenter = NoteListPresenter(loaderManager, noteCursorAdapter, this)
+        prepareNoteList()
     }
 
     override fun onStart() {
@@ -67,8 +59,6 @@ class NoteListActivity : AppCompatActivity(), NoteListContract.View {
 
     public override fun onResume() {
         super.onResume()
-        // need to kickoff the loadermanager again
-        mPresenter?.start()
     }
 
     override fun onBackPressed() {
@@ -76,18 +66,15 @@ class NoteListActivity : AppCompatActivity(), NoteListContract.View {
             super.onBackPressed()
             return
         } else {
-            Toast.makeText(baseContext, "Tap back again to exit", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Tap back again to exit", Toast.LENGTH_SHORT).show()
         }
         mBackPressed = System.currentTimeMillis()
     }
 
-    /**
-     * Overflow Menu Related
-     */
     override fun onPrepareOptionsMenu(menu: Menu): Boolean {
         super.onPrepareOptionsMenu(menu)
         val insertDummyData = menu.findItem(R.id.action_insert)
-        insertDummyData.title = "Insert " + NoteListPresenter.dummyDataCount.toString() + " data"
+        insertDummyData.title = "Insert data"
         return true
     }
 
@@ -105,7 +92,7 @@ class NoteListActivity : AppCompatActivity(), NoteListContract.View {
             }
 
             override fun onQueryTextChange(s: String): Boolean {
-                mPresenter?.searchQuery(s)
+                viewModel.search(s)
                 return false
             }
         })
@@ -119,12 +106,12 @@ class NoteListActivity : AppCompatActivity(), NoteListContract.View {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.action_delete_all -> {
-                mPresenter?.deleteAllNotes()
+                viewModel
                 true
             }
 
             R.id.action_insert -> {
-                mPresenter?.generateDummyNotes()
+                viewModel.debugInsert()
                 true
             }
 
@@ -153,113 +140,51 @@ class NoteListActivity : AppCompatActivity(), NoteListContract.View {
         }
     }
 
-    /**
-     * Activity Methods
-     */
-    // ListView Related
-    private fun prepareListView() {
-        binding.lvNoteList.adapter = noteCursorAdapter
-        binding.lvNoteList.emptyView = binding.emptyNoteListView
-
-        // Multi select listview
-        binding.lvNoteList.choiceMode = ListView.CHOICE_MODE_MULTIPLE_MODAL
-        binding.lvNoteList.setMultiChoiceModeListener(object : MultiChoiceModeListener {
-            override fun onItemCheckedStateChanged(
-                actionMode: ActionMode,
-                i: Int,
-                l: Long,
-                b: Boolean
-            ) {
-                val checkedCount = binding.lvNoteList.checkedItemCount
-                actionMode.title = "$checkedCount Selected"
-                noteCursorAdapter.toggleSelection(i)
-            }
-
-            override fun onCreateActionMode(actionMode: ActionMode, menu: Menu): Boolean {
-                actionMode.menuInflater.inflate(R.menu.menu_note_list_onselect, menu)
-                return true
-            }
-
-            override fun onPrepareActionMode(actionMode: ActionMode, menu: Menu): Boolean {
-                return false
-            }
-
-            // ActionMode Menu
-            override fun onActionItemClicked(actionMode: ActionMode, menuItem: MenuItem): Boolean {
-                return when (menuItem.itemId) {
-                    R.id.onselect_select_all -> {
-                        noteCursorAdapter.removeSelection()
-                        var x = 0
-                        while (x < noteCursorAdapter.count) {
-                            binding.lvNoteList.setItemChecked(x, true)
-                            x++
-                        }
-                        val checkedCount = binding.lvNoteList.checkedItemCount
-                        actionMode.title = "$checkedCount Selected"
-                        true
-                    }
-
-                    R.id.onselect_delete -> {
-                        showDeleteConfirmationDialog { _: DialogInterface?, _: Int ->
-                            mPresenter?.deleteSelectedNotes()?.let { rowsDeleted ->
-
-                                Toast.makeText(
-                                    this@NoteListActivity,
-                                    "Deleted " + rowsDeleted + if (rowsDeleted > 1) " notes" else " note",
-                                    Toast.LENGTH_SHORT
-                                ).show()
-
-                            }
-                            actionMode.finish()
-                        }
-                        true
-                    }
-
-                    else -> false
-                }
-            }
-
-            override fun onDestroyActionMode(actionMode: ActionMode) {
-                noteCursorAdapter.removeSelection()
-            }
-        })
-
-        // Onclick listView
-        binding.lvNoteList.onItemClickListener =
-            OnItemClickListener { _: AdapterView<*>?, _: View?, _: Int, id: Long ->
-                val intent = Intent(this@NoteListActivity, EditorActivity::class.java)
-                val currentNoteUri =
-                    ContentUris.withAppendedId(NoteContract.NotesEntry.CONTENT_URI, id)
-                intent.data = currentNoteUri
-                startActivity(intent)
-            }
+    private fun prepareNoteList() {
+        viewModel.notesLiveData.observe(this) { notes ->
+            binding.emptyNoteListView.isVisible = notes.isEmpty()
+            notesAdapter.submitList(notes.toList())
+        }
+        binding.rvNoteList.adapter = notesAdapter
     }
 
-    override fun showDeleteConfirmationDialog(deleteClickListener: DialogInterface.OnClickListener?) {
-        val builder = AlertDialog.Builder(this)
-        builder.setMessage("Selected note(s) will be deleted!")
-            .setPositiveButton("Cancel") { dialogInterface: DialogInterface?, _: Int -> dialogInterface?.dismiss() }
-            .setNegativeButton("Delete", deleteClickListener).show()
+    override fun onNoteClicked(note: Note) {
+        val intent = Intent(this, EditorActivity::class.java).apply {
+            putExtra("ID", note.id)
+        }
+        startActivity(intent)
+    }
+
+    override fun onNoteLongClicked(note: Note) {
+        showDeleteConfirmationDialog(
+            onDeleteClicked = { viewModel.deleteById(note.id) }
+        )
+    }
+
+    private fun showDeleteConfirmationDialog(onDeleteClicked:() -> Unit) {
+        AlertDialog.Builder(this)
+            .setMessage("Selected note(s) will be deleted!")
+            .setPositiveButton("Cancel") { dialogInterface: DialogInterface?, _: Int ->
+                dialogInterface?.dismiss()
+            }
+            .setNegativeButton("Delete") { _: DialogInterface?, _: Int ->
+                onDeleteClicked.invoke()
+            }
+            .show()
     }
 
     private fun openGitbookJournal() {
         val url = "https://hyuwah.gitbooks.io/journal-refactory/content/"
         val uri = Uri.parse(url)
-        val builder = CustomTabsIntent.Builder()
-        builder.setToolbarColor(ContextCompat.getColor(this, R.color.colorPrimary))
-        builder.addDefaultShareMenuItem()
-        builder.setShowTitle(true)
-        val customTabsIntent = builder.build()
-        CustomTabActivityHelper.openCustomTab(
-            this, customTabsIntent, uri
-        ) { activity: Activity, uri1: Uri? ->
-            val intent = Intent(Intent.ACTION_VIEW, uri1)
-            activity.startActivity(intent)
+        val customTabIntent = CustomTabsIntent.Builder()
+            .setToolbarColor(ContextCompat.getColor(this, R.color.colorPrimary))
+            .setShareState(CustomTabsIntent.SHARE_STATE_ON)
+            .setShowTitle(true)
+            .build()
+        CustomTabActivityHelper.openCustomTab(this, customTabIntent, uri) { activity: Activity, uri1: Uri? ->
+            activity.startActivity(Intent(Intent.ACTION_VIEW, uri1))
         }
     }
-
-    override val activityContext: Context
-        get() = this
 
     companion object {
         // Double tap back to exit

@@ -4,60 +4,53 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="io.github.hyuwah.catatanku.NoteListActivity">
-
-
-    // List View
+    tools:context="io.github.hyuwah.catatanku.ui.notelist.NoteListActivity">
 
     <ListView
         android:id="@+id/lv_note_list"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent"
+        android:visibility="gone" />
 
-    // Empty View
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_note_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+
     <RelativeLayout
         android:id="@+id/empty_note_list_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true">
 
-        <!--<ImageView-->
-            <!--android:id="@+id/empty_nlv_image"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:src="@drawable/file"-->
-          <!--android:visibility="gone"-->
-            <!--android:layout_centerHorizontal="true"/>-->
-
         <com.airbnb.lottie.LottieAnimationView
-          android:id="@+id/lottie_empty"
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          app:lottie_rawRes="@raw/empty_status"
-          app:lottie_loop="true"
-          app:lottie_autoPlay="true"
-          />
-
-        <TextView
-            android:layout_marginTop="8dp"
-            android:textAlignment="center"
+            android:id="@+id/lottie_empty"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            app:lottie_autoPlay="true"
+            app:lottie_loop="true"
+            app:lottie_rawRes="@raw/empty_status" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/lottie_empty"
             android:layout_centerHorizontal="true"
+            android:layout_marginTop="8dp"
             android:text="It's empty...\nAdd some notes via button below"
-            android:textAppearance="?android:textAppearanceSmall"
-            android:layout_below="@+id/lottie_empty"/>
+            android:textAlignment="center"
+            android:textAppearance="?android:textAppearanceSmall" />
 
     </RelativeLayout>
-
-    // FAB
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
         android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/fab_margin"
         android:tint="#fff"

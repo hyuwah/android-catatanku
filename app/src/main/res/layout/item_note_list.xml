@@ -1,43 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-  xmlns:tools="http://schemas.android.com/tools"
-  android:layout_width="match_parent"
-  android:layout_height="wrap_content"
-  android:paddingTop="8dp"
-  android:paddingBottom="8dp"
-  android:paddingLeft="16dp"
-  android:paddingRight="16dp"
-  android:background="@drawable/note_list_activated"
-  android:orientation="vertical"
-  >
-
-  <TextView
-    android:id="@+id/note_time"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingBottom="8dp"
-    android:textAppearance="?android:textAppearanceSmall"
-    android:textSize="12sp"
-    tools:text="Senin, 20 Januari 2018 09:23"/>
+    android:background="@drawable/note_list_activated"
+    android:orientation="vertical"
+    android:paddingLeft="16dp"
+    android:paddingTop="8dp"
+    android:paddingRight="16dp"
+    android:paddingBottom="8dp">
 
-  <TextView
-    android:id="@+id/note_title"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:paddingBottom="8dp"
-    android:fontFamily="sans-serif"
-    android:textAppearance="?android:textAppearanceLarge"
-    android:textColor="@color/black"
-    tools:text="Judul Catatan"
-    />
+    <TextView
+        android:id="@+id/note_time"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="8dp"
+        android:textAppearance="?android:textAppearanceSmall"
+        android:textSize="12sp"
+        tools:text="Senin, 20 Januari 2018 09:23" />
 
-  <TextView
-    android:id="@+id/note_excerpt"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:textAppearance="?android:textAppearanceMedium"
-    android:textColor="@color/black"
-    tools:text="Lorem Ipsum dolor sit amet ..."/>
+    <TextView
+        android:id="@+id/note_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:fontFamily="sans-serif"
+        android:maxLines="3"
+        android:paddingBottom="8dp"
+        android:textAppearance="?android:textAppearanceLarge"
+        android:textColor="@color/black"
+        tools:text="Judul Catatan" />
+
+    <TextView
+        android:id="@+id/note_excerpt"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:maxLines="3"
+        android:textAppearance="?android:textAppearanceMedium"
+        android:textColor="@color/black"
+        tools:text="Lorem Ipsum dolor sit amet ..." />
 
 
 </LinearLayout>
