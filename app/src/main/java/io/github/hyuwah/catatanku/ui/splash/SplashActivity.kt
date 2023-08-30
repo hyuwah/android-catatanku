@@ -3,8 +3,13 @@ package io.github.hyuwah.catatanku.ui.splash
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import io.github.hyuwah.catatanku.databinding.ActivitySplashBinding
 import io.github.hyuwah.catatanku.ui.notelist.NoteListActivity
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class SplashActivity : AppCompatActivity() {
 
@@ -13,20 +18,12 @@ class SplashActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivitySplashBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        // Delayed 2s to Main Activity
-        val launch: Thread = object : Thread() {
-            override fun run() {
-                try {
-                    sleep(2000)
-                } catch (e: InterruptedException) {
-                    e.printStackTrace()
-                } finally {
-                    startActivity(Intent(this@SplashActivity, NoteListActivity::class.java))
-                    finish()
-                }
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.CREATED) {
+                delay(2000)
+                startActivity(Intent(this@SplashActivity, NoteListActivity::class.java))
+                finish()
             }
         }
-        launch.start()
     }
 }
