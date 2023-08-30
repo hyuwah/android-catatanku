@@ -4,7 +4,9 @@ import io.github.hyuwah.catatanku.domain.model.Note
 import kotlinx.coroutines.flow.Flow
 
 interface NoteRepository {
-    suspend fun upsert(note: Note)
+    suspend fun upsertNote(note: Note)
+
+    suspend fun upsertNotes(notes: List<Note>)
 
     suspend fun deleteById(id: String)
 

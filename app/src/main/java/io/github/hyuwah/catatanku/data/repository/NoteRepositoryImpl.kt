@@ -12,8 +12,13 @@ import javax.inject.Inject
 class NoteRepositoryImpl @Inject constructor(
     private val dao: NotesDao
 ) : NoteRepository {
-    override suspend fun upsert(note: Note) {
-        dao.upsert(note.toEntity())
+    override suspend fun upsertNote(note: Note) {
+        dao.upsertNotes(note.toEntity())
+    }
+
+    override suspend fun upsertNotes(notes: List<Note>) {
+        val noteEntities = notes.map { it.toEntity() }
+        dao.upsertNotes(*noteEntities.toTypedArray())
     }
 
     override suspend fun deleteById(id: String) {

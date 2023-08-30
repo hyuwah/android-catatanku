@@ -8,7 +8,10 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface NotesDao {
     @Upsert
-    suspend fun upsert(noteEntity: NoteEntity)
+    suspend fun upsertNote(noteEntity: NoteEntity)
+
+    @Upsert
+    suspend fun upsertNotes(vararg noteEntity: NoteEntity)
 
     @Query("DELETE FROM note_table WHERE id = :id")
     suspend fun deleteById(id: String)
