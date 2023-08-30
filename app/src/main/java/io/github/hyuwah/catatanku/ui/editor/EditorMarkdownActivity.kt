@@ -1,13 +1,12 @@
 package io.github.hyuwah.catatanku.ui.editor
 
 import android.os.Bundle
-import android.text.TextUtils
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import br.tiagohm.markdownview.css.styles.Github
 import dagger.hilt.android.AndroidEntryPoint
 import io.github.hyuwah.catatanku.databinding.ActivityEditorMarkdownBinding
 import io.github.hyuwah.catatanku.domain.model.Note
+import io.github.hyuwah.catatanku.utils.markdown.MarkwonFactory
 
 @AndroidEntryPoint
 class EditorMarkdownActivity : AppCompatActivity() {
@@ -26,12 +25,14 @@ class EditorMarkdownActivity : AppCompatActivity() {
         intent.getStringExtra("BODY").orEmpty()
     }
 
+    private val markwon by lazy {
+        MarkwonFactory.get(this)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityEditorMarkdownBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        binding.editorMarkdownView.addStyleSheet(Github())
 
         viewModel.note.observe(this, ::setupMarkdown)
 
@@ -39,13 +40,13 @@ class EditorMarkdownActivity : AppCompatActivity() {
             viewModel.getNoteById(noteId)
         } else {
             title = legacyTitle.ifBlank { "Untitled" }
-            binding.editorMarkdownView.loadMarkdown(legacyContent)
+            markwon.setMarkdown(binding.markdownContainer, legacyContent)
         }
 
     }
 
     private fun setupMarkdown(note: Note) {
         title = note.title
-        binding.editorMarkdownView.loadMarkdown(note.contentText)
+        markwon.setMarkdown(binding.markdownContainer, note.contentText)
     }
 }

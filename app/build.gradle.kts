@@ -74,7 +74,6 @@ kapt {
 }
 
 dependencies {
-    implementation(libs.kotlin.stdlib.jdk7)
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
@@ -94,8 +93,13 @@ dependencies {
     implementation(libs.bundles.coroutines)
 
     implementation(libs.android.about.page)
-    implementation(libs.markdownview)
     implementation(libs.lottie)
+    implementation(libs.bundles.markwon) {
+        exclude(group = "org.jetbrains", module = "annotations-java5")
+    }
+    kapt(libs.prism4j.bundler) {
+        exclude(group = "org.jetbrains", module = "annotations-java5")
+    }
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test.ext.junit)

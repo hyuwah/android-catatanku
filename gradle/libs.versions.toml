@@ -22,6 +22,8 @@ lottie = "2.5.4"
 material = "1.9.0"
 markdownview = "0.19.0"
 room = "2.5.2"
+markwon = "4.6.2"
+prism4j = "2.0.0"
 
 [libraries]
 androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompat" }
@@ -57,7 +59,16 @@ room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
 
 lottie = { module = "com.airbnb.android:lottie", version.ref = "lottie" }
 android-about-page = { module = "com.github.medyo:android-about-page", version.ref = "android-about-page" }
-markdownview = { module = "com.github.tiagohm.MarkdownView:library", version.ref = "markdownview" }
+
+markwon-core = { module = "io.noties.markwon:core", version.ref = "markwon" }
+markwon-editor = { module = "io.noties.markwon:editor", version.ref = "markwon" }
+markwon-strikethrough = { module = "io.noties.markwon:ext-strikethrough", version.ref = "markwon" }
+markwon-tables = { module = "io.noties.markwon:ext-tables", version.ref = "markwon" }
+markwon-tasklist = { module = "io.noties.markwon:ext-tasklist", version.ref = "markwon" }
+markwon-image = { module = "io.noties.markwon:image-coil", version.ref = "markwon" }
+markwon-linkify = { module = "io.noties.markwon:linkify", version.ref = "markwon" }
+markwon-syntaxhighlight = { module = "io.noties.markwon:syntax-highlight", version.ref = "markwon" }
+prism4j-bundler = { module = "io.noties:prism4j-bundler", version.ref = "prism4j" }
 
 junit = { module = "junit:junit", version.ref = "junit" }
 androidx-test-ext-junit = { module = "androidx.test.ext:junit", version.ref = "androidx-test-ext-junit" }
@@ -75,3 +86,4 @@ ksp = { id = "com.google.devtools.ksp", version.ref = "ksp"}
 coroutines = ["coroutine-core", "coroutine-android"]
 lifecycle = ["lifecycle-viewmodel-ktx", "lifecycle-livedata-ktx", "lifecycle-runtime-ktx", "lifecycle-java8"]
 room = ["room-runtime", "room-ktx"]
+markwon = ["markwon-core", "markwon-editor", "markwon-image", "markwon-linkify", "markwon-syntaxhighlight", "markwon-strikethrough", "markwon-tables", "markwon-tasklist"]
