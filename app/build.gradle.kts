@@ -76,6 +76,7 @@ kapt {
 dependencies {
     implementation(libs.kotlin.stdlib.jdk7)
     implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.browser)
 

@@ -2,6 +2,7 @@
 agp = "8.1.1"
 android-about-page = "1.2.2"
 appcompat = "1.6.1"
+activity = "1.7.2"
 browser = "1.5.0"
 constraintlayout = "2.1.4"
 kotlin = "1.8.20"
@@ -24,6 +25,7 @@ room = "2.5.2"
 
 [libraries]
 androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompat" }
+androidx-activity = { module = "androidx.activity:activity-ktx", version.ref = "activity" }
 androidx-browser = { module = "androidx.browser:browser", version.ref = "browser" }
 androidx-constraintlayout = { module = "androidx.constraintlayout:constraintlayout", version.ref = "constraintlayout" }
 
