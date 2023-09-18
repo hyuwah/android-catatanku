@@ -8,6 +8,7 @@ plugins {
     alias(libs.plugins.kotlin.kapt)
     alias(libs.plugins.kotlin.parcelize)
     alias(libs.plugins.hilt.gradle)
+    alias(libs.plugins.ksp)
 }
 
 // [1][0][0][00] ... [9+][9][9][99]
@@ -71,6 +72,7 @@ android {
 
 kapt {
     correctErrorTypes = true
+    useBuildCache = true
 }
 
 dependencies {
@@ -85,10 +87,10 @@ dependencies {
     implementation(libs.bundles.lifecycle)
 
     implementation(libs.hilt.android)
-    kapt(libs.hilt.android.compiler)
+    ksp(libs.hilt.android.compiler)
 
     implementation(libs.bundles.room)
-    kapt(libs.room.compiler)
+    ksp(libs.room.compiler)
 
     implementation(libs.bundles.coroutines)
 
