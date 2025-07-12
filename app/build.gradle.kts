@@ -14,8 +14,8 @@ plugins {
 // [1][0][0][00] ... [9+][9][9][99]
 val versionMajor = 1
 val versionMinor = 1
-val versionPatch = 0
-val versionBuild = 2 // bump for dogfood builds, public betas, etc.
+val versionPatch = 1
+val versionBuild = 0 // bump for dogfood builds, public betas, etc.
 android {
     signingConfigs {
         create("release") {
