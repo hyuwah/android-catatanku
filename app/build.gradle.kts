@@ -15,7 +15,7 @@ plugins {
 val versionMajor = 1
 val versionMinor = 1
 val versionPatch = 0
-val versionBuild = 1 // bump for dogfood builds, public betas, etc.
+val versionBuild = 2 // bump for dogfood builds, public betas, etc.
 android {
     signingConfigs {
         create("release") {
