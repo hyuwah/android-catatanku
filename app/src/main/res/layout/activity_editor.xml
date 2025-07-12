@@ -7,6 +7,12 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
+    <io.github.hyuwah.catatanku.ui.common.AppToolBar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        />
+
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -52,6 +58,7 @@
     </ScrollView>
 
     <LinearLayout
+        android:id="@+id/ll_notes_info"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="#333"

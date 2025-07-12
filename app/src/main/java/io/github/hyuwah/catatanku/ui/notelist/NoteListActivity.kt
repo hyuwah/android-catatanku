@@ -9,10 +9,10 @@ import android.net.Uri
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.SearchView
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.SearchView
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
@@ -22,6 +22,7 @@ import io.github.hyuwah.catatanku.databinding.ActivityNoteListBinding
 import io.github.hyuwah.catatanku.domain.model.Note
 import io.github.hyuwah.catatanku.ui.about.AboutActivity
 import io.github.hyuwah.catatanku.ui.editor.EditorActivity
+import io.github.hyuwah.catatanku.utils.adjustInsets
 import io.github.hyuwah.catatanku.utils.chrome.CustomTabActivityHelper
 
 @AndroidEntryPoint
@@ -45,7 +46,8 @@ class NoteListActivity : AppCompatActivity(), NotesAdapter.NoteItemListener {
         super.onCreate(savedInstanceState)
         binding = ActivityNoteListBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        
+        adjustInsets()
+        setSupportActionBar(binding.toolbar)
         binding.fab.setOnClickListener {
             startActivity(Intent(this, EditorActivity::class.java))
         }
@@ -55,10 +57,6 @@ class NoteListActivity : AppCompatActivity(), NotesAdapter.NoteItemListener {
     override fun onStart() {
         super.onStart()
         invalidateOptionsMenu()
-    }
-
-    public override fun onResume() {
-        super.onResume()
     }
 
     override fun onBackPressed() {
@@ -73,8 +71,6 @@ class NoteListActivity : AppCompatActivity(), NotesAdapter.NoteItemListener {
 
     override fun onPrepareOptionsMenu(menu: Menu): Boolean {
         super.onPrepareOptionsMenu(menu)
-        val insertDummyData = menu.findItem(R.id.action_insert)
-        insertDummyData.title = "Insert data"
         return true
     }
 
@@ -84,7 +80,7 @@ class NoteListActivity : AppCompatActivity(), NotesAdapter.NoteItemListener {
 
         //Associate searchable config with the Searchview
         val searchManager = getSystemService(SEARCH_SERVICE) as SearchManager
-        val searchView = menu.findItem(R.id.action_search).actionView as SearchView?
+        val searchView = menu.findItem(R.id.action_search).actionView as? SearchView
         searchView?.setSearchableInfo(searchManager.getSearchableInfo(componentName))
         searchView?.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(s: String): Boolean {
@@ -106,7 +102,7 @@ class NoteListActivity : AppCompatActivity(), NotesAdapter.NoteItemListener {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.action_delete_all -> {
-                viewModel
+                viewModel.deleteAll()
                 true
             }
 
@@ -137,6 +133,13 @@ class NoteListActivity : AppCompatActivity(), NotesAdapter.NoteItemListener {
             }
 
             else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    private fun adjustInsets() {
+        with(binding) {
+            fab.adjustInsets(navigationBar = true)
+            rvNoteList.adjustInsets(navigationBar = true)
         }
     }
 

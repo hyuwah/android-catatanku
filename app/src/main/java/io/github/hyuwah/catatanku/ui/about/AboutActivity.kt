@@ -8,6 +8,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.edit
 import io.github.hyuwah.catatanku.BuildConfig
 import io.github.hyuwah.catatanku.R
+import io.github.hyuwah.catatanku.databinding.ActivityAboutBinding
+import io.github.hyuwah.catatanku.ui.common.AppToolBar
+import io.github.hyuwah.catatanku.utils.viewBinding
 import mehdi.sakout.aboutpage.AboutPage
 import mehdi.sakout.aboutpage.Element
 import java.util.Calendar
@@ -18,8 +21,11 @@ class AboutActivity : AppCompatActivity() {
         getSharedPreferences(getString(R.string.pref_file_key), MODE_PRIVATE)
     }
 
+    private val binding by viewBinding(ActivityAboutBinding::inflate)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setContentView(binding.root)
         val aboutPage = AboutPage(this)
             .isRTL(false)
             .setImage(R.mipmap.ic_launcher)
@@ -31,13 +37,16 @@ class AboutActivity : AppCompatActivity() {
             .addGitHub("hyuwah", "Check other projects on Github")
             .addItem(copyRightsElement)
             .create()
-        setContentView(aboutPage)
+        binding.contentContainer.addView(aboutPage)
+        setSupportActionBar(binding.toolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white_24)
     }
 
     private val versionElement = Element().apply {
         title = "Version ${BuildConfig.VERSION_NAME}"
-        setOnClickListener {
-            toggleDebugMode()
+        if (BuildConfig.DEBUG) {
+            setOnClickListener { toggleDebugMode() }
         }
     }
 

@@ -74,4 +74,10 @@ class NoteListViewModel @Inject constructor(
         }
     }
 
+    fun deleteAll() {
+        val noteIds = notesLiveData.value?.map { it.id } ?: emptyList()
+        if (noteIds.isEmpty()) return
+        deleteByIds(noteIds)
+    }
+
 }

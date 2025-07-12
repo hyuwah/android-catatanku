@@ -17,6 +17,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import io.github.hyuwah.catatanku.R
 import io.github.hyuwah.catatanku.databinding.ActivityEditorBinding
 import io.github.hyuwah.catatanku.domain.model.Note
+import io.github.hyuwah.catatanku.utils.adjustInsets
 import java.text.SimpleDateFormat
 import java.util.Date
 
@@ -39,6 +40,9 @@ class EditorActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityEditorBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        setSupportActionBar(binding.toolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white_24)
 
         viewModel.note.observe(this, ::onNoteLoaded)
 
@@ -127,6 +131,10 @@ class EditorActivity : AppCompatActivity() {
         }
     }
 
+    private fun adjustInsets() {
+        binding.llNotesInfo.adjustInsets(navigationBar = true)
+    }
+
     private fun hasUnsavedChanges(): Boolean {
         return viewModel.hasUnsavedChanges(
             title = binding.editorNoteTitle.text.toString().trim(),
@@ -164,7 +172,7 @@ class EditorActivity : AppCompatActivity() {
     }
 
     private fun clearEditor() {
-        if (binding.editorNoteTitle.text.isNotBlank() && binding.editorNoteBody.text.isNotBlank()) {
+        if (binding.editorNoteTitle.text.isNotBlank() || binding.editorNoteBody.text.isNotBlank()) {
             showClearConfirmationDialog(
                 onClearClicked = {
                     hasChanged = true
