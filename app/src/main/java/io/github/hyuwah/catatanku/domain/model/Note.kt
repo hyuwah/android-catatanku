@@ -5,5 +5,7 @@ data class Note(
     var title: String,
     var contentText: String,
     var createdAt: Long,
-    var updatedAt: Long
+    var updatedAt: Long,
+    var folderId: String? = null,
+    val tags: List<Tag> = emptyList()
 )

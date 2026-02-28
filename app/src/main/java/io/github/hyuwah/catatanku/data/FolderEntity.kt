@@ -7,29 +7,27 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 
 @Entity(
-    "note_table",
+    "folder_table",
     foreignKeys = [
         ForeignKey(
             entity = FolderEntity::class,
             parentColumns = ["id"],
-            childColumns = ["folder_id"],
-            onDelete = ForeignKey.SET_NULL
+            childColumns = ["parent_id"],
+            onDelete = ForeignKey.CASCADE
         )
     ],
-    indices = [Index(value = ["folder_id"])]
+    indices = [Index(value = ["parent_id"])]
 )
-data class NoteEntity(
+data class FolderEntity(
     @PrimaryKey
     @ColumnInfo("id")
     val id: String,
-    @ColumnInfo("title")
-    val title: String,
-    @ColumnInfo("content_text")
-    var contentText: String,
+    @ColumnInfo("name")
+    val name: String,
+    @ColumnInfo("parent_id")
+    val parentId: String? = null,
     @ColumnInfo("created_at")
-    var createdAt: Long,
+    val createdAt: Long,
     @ColumnInfo("updated_at")
-    var updatedAt: Long,
-    @ColumnInfo("folder_id")
-    var folderId: String? = null
+    val updatedAt: Long
 )
