@@ -19,9 +19,10 @@ espresso-core = "3.6.1"
 lottie = "6.6.7"
 material = "1.12.0"
 markdownview = "0.19.0"
-room = "2.7.2"
+room = "2.8.4"
 markwon = "4.6.2"
 prism4j = "2.0.0"
+paging = "3.4.1"
 
 [libraries]
 androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompat" }
@@ -54,6 +55,9 @@ lifecycle-java8 = { module = "androidx.lifecycle:lifecycle-common-java8", versio
 room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
 room-ktx = { module = "androidx.room:room-ktx", version.ref = "room" }
 room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
+room-paging = { module = "androidx.room:room-paging", version.ref = "room" }
+
+paging-runtime = { module = "androidx.paging:paging-runtime-ktx", version.ref = "paging" }
 
 lottie = { module = "com.airbnb.android:lottie", version.ref = "lottie" }
 android-about-page = { module = "com.github.medyo:android-about-page", version.ref = "android-about-page" }
@@ -83,5 +87,6 @@ ksp = { id = "com.google.devtools.ksp", version.ref = "ksp"}
 [bundles]
 coroutines = ["coroutine-core", "coroutine-android"]
 lifecycle = ["lifecycle-viewmodel-ktx", "lifecycle-livedata-ktx", "lifecycle-runtime-ktx", "lifecycle-java8"]
-room = ["room-runtime", "room-ktx"]
+room = ["room-runtime", "room-ktx", "room-paging"]
 markwon = ["markwon-core", "markwon-editor", "markwon-image", "markwon-linkify", "markwon-syntaxhighlight", "markwon-strikethrough", "markwon-tables", "markwon-tasklist"]
+paging = ["paging-runtime"]

@@ -1,5 +1,6 @@
 package io.github.hyuwah.catatanku.domain.repository
 
+import androidx.paging.PagingData
 import io.github.hyuwah.catatanku.domain.model.Note
 import kotlinx.coroutines.flow.Flow
 
@@ -12,5 +13,7 @@ interface NoteRepository {
 
     suspend fun getNoteById(id: String): Note
 
-    fun getNotes(): Flow<List<Note>>
+    fun getNotesPaged(): Flow<PagingData<Note>>
+
+    fun searchNotesPaged(query: String): Flow<PagingData<Note>>
 }

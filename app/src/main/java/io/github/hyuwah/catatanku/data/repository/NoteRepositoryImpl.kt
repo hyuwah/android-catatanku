@@ -1,5 +1,9 @@
 package io.github.hyuwah.catatanku.data.repository
 
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import androidx.paging.map
 import io.github.hyuwah.catatanku.data.NotesDao
 import io.github.hyuwah.catatanku.data.toDomain
 import io.github.hyuwah.catatanku.data.toEntity
@@ -12,6 +16,11 @@ import javax.inject.Inject
 class NoteRepositoryImpl @Inject constructor(
     private val dao: NotesDao
 ) : NoteRepository {
+
+    companion object {
+        private const val PAGE_SIZE = 20
+    }
+
     override suspend fun upsertNote(note: Note) {
         dao.upsertNotes(note.toEntity())
     }
@@ -29,7 +38,27 @@ class NoteRepositoryImpl @Inject constructor(
         return dao.getNoteById(id).toDomain()
     }
 
-    override fun getNotes(): Flow<List<Note>> {
-        return dao.getNotes().map { notes -> notes.map { it.toDomain() } }
+    override fun getNotesPaged(): Flow<PagingData<Note>> {
+        return Pager(
+            config = PagingConfig(
+                pageSize = PAGE_SIZE,
+                enablePlaceholders = false
+            ),
+            pagingSourceFactory = { dao.getNotesPaged() }
+        ).flow.map { pagingData ->
+            pagingData.map { it.toDomain() }
+        }
+    }
+
+    override fun searchNotesPaged(query: String): Flow<PagingData<Note>> {
+        return Pager(
+            config = PagingConfig(
+                pageSize = PAGE_SIZE,
+                enablePlaceholders = false
+            ),
+            pagingSourceFactory = { dao.searchNotesPaged(query) }
+        ).flow.map { pagingData ->
+            pagingData.map { it.toDomain() }
+        }
     }
 }

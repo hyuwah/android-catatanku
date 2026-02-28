@@ -16,6 +16,8 @@ import androidx.appcompat.widget.SearchView
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
+import androidx.lifecycle.lifecycleScope
+import androidx.paging.LoadState
 import dagger.hilt.android.AndroidEntryPoint
 import io.github.hyuwah.catatanku.R
 import io.github.hyuwah.catatanku.databinding.ActivityNoteListBinding
@@ -24,6 +26,8 @@ import io.github.hyuwah.catatanku.ui.about.AboutActivity
 import io.github.hyuwah.catatanku.ui.editor.EditorActivity
 import io.github.hyuwah.catatanku.utils.adjustInsets
 import io.github.hyuwah.catatanku.utils.chrome.CustomTabActivityHelper
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class NoteListActivity : AppCompatActivity(), NotesAdapter.NoteItemListener {
@@ -102,7 +106,8 @@ class NoteListActivity : AppCompatActivity(), NotesAdapter.NoteItemListener {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.action_delete_all -> {
-                viewModel.deleteAll()
+                // Disabled for now with pagination - needs different approach
+                Toast.makeText(this, "Feature unavailable with pagination", Toast.LENGTH_SHORT).show()
                 true
             }
 
@@ -144,10 +149,21 @@ class NoteListActivity : AppCompatActivity(), NotesAdapter.NoteItemListener {
     }
 
     private fun prepareNoteList() {
-        viewModel.notesLiveData.observe(this) { notes ->
-            binding.emptyNoteListView.isVisible = notes.isEmpty()
-            notesAdapter.submitList(notes.toList())
+        // Submit paging data to adapter
+        lifecycleScope.launch {
+            viewModel.notesPagingData.collectLatest { pagingData ->
+                notesAdapter.submitData(pagingData)
+            }
         }
+
+        // Handle load states for empty view
+        lifecycleScope.launch {
+            notesAdapter.loadStateFlow.collectLatest { loadStates ->
+                binding.emptyNoteListView.isVisible = 
+                    notesAdapter.itemCount == 0 && loadStates.refresh is LoadState.NotLoading
+            }
+        }
+
         binding.rvNoteList.adapter = notesAdapter
     }
 

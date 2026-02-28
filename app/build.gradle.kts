@@ -30,7 +30,7 @@ android {
     compileSdk = 35
     defaultConfig {
         applicationId = "io.github.hyuwah.catatanku"
-        minSdk = 21
+        minSdk = 23
         targetSdk = 35
         versionCode = (versionMajor * 10000) + (versionMinor * 1000) + (versionPatch * 100) + versionBuild
         versionName = "${versionMajor}.${versionMinor}.${versionPatch}"
@@ -91,6 +91,8 @@ dependencies {
 
     implementation(libs.bundles.room)
     ksp(libs.room.compiler)
+
+    implementation(libs.bundles.paging)
 
     implementation(libs.bundles.coroutines)
 

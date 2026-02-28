@@ -79,6 +79,8 @@ captures/
 .idea/libraries/
 .idea/navEditor.xml
 .idea/assetWizardSettings.xml
+.idea/misc.xml
+.idea/caches/deviceStreaming.xml
 .idea/ChatHistory_schema_v2.xml
 
 # Explicitly unignore files that should be kept in .idea

@@ -2,8 +2,8 @@ package io.github.hyuwah.catatanku.ui.notelist
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import io.github.hyuwah.catatanku.databinding.ItemNoteListBinding
 import io.github.hyuwah.catatanku.domain.model.Note
@@ -13,7 +13,7 @@ import java.util.Locale
 
 class NotesAdapter(
     private val noteItemListener: NoteItemListener
-) : ListAdapter<Note, NotesAdapter.ViewHolder>(differ) {
+) : PagingDataAdapter<Note, NotesAdapter.ViewHolder>(differ) {
     companion object {
         private val differ = object : DiffUtil.ItemCallback<Note>() {
             override fun areItemsTheSame(oldItem: Note, newItem: Note): Boolean {
@@ -37,7 +37,9 @@ class NotesAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bind(currentList[position], noteItemListener)
+        getItem(position)?.let { note ->
+            holder.bind(note, noteItemListener)
+        }
     }
 
     class ViewHolder(
