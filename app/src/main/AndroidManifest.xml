@@ -45,9 +45,7 @@
         </activity>
         <activity
             android:name=".ui.about.AboutActivity"
-            android:exported="false"
-            android:label="About"
-            android:parentActivityName=".ui.notelist.NoteListActivity" />
+            android:exported="false" />
         <activity
             android:name=".ui.editor.EditorMarkdownActivity"
             android:exported="false" />

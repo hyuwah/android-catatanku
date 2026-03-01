@@ -1,7 +1,6 @@
 import java.util.Properties
 import java.io.FileInputStream
 
-@Suppress("DSL_SCOPE_VIOLATION") // TODO: Remove once KTIJ-19369 is fixed
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -9,6 +8,7 @@ plugins {
     alias(libs.plugins.kotlin.parcelize)
     alias(libs.plugins.hilt.gradle)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.compose.compiler)
 }
 
 // [1][0][0][00] ... [9+][9][9][99]
@@ -39,6 +39,7 @@ android {
     }
     buildFeatures {
         viewBinding = true
+        compose = true
     }
     buildTypes {
         getByName("release") {
@@ -93,6 +94,7 @@ dependencies {
     ksp(libs.room.compiler)
 
     implementation(libs.bundles.paging)
+    implementation(libs.bundles.navigation)
 
     implementation(libs.bundles.coroutines)
 
@@ -104,6 +106,10 @@ dependencies {
     kapt(libs.prism4j.bundler) {
         exclude(group = "org.jetbrains", module = "annotations-java5")
     }
+
+    implementation(platform(libs.compose.bom))
+    implementation(libs.bundles.compose)
+    debugImplementation(libs.compose.ui.tooling)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test.ext.junit)
