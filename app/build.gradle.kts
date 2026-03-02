@@ -27,11 +27,11 @@ android {
             storePassword = props.getProperty("storePassword")
         }
     }
-    compileSdk = 35
+    compileSdk = 36
     defaultConfig {
         applicationId = "io.github.hyuwah.catatanku"
         minSdk = 23
-        targetSdk = 35
+        targetSdk = 36
         versionCode = (versionMajor * 10000) + (versionMinor * 1000) + (versionPatch * 100) + versionBuild
         versionName = "${versionMajor}.${versionMinor}.${versionPatch}"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -63,8 +63,8 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
         sourceCompatibility = JavaVersion.VERSION_17
     }
-    kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_17.toString()
+    kotlin {
+        jvmToolchain(17)
     }
     productFlavors {
     }
@@ -98,14 +98,7 @@ dependencies {
 
     implementation(libs.bundles.coroutines)
 
-    implementation(libs.android.about.page)
     implementation(libs.lottie)
-    implementation(libs.bundles.markwon) {
-        exclude(group = "org.jetbrains", module = "annotations-java5")
-    }
-    kapt(libs.prism4j.bundler) {
-        exclude(group = "org.jetbrains", module = "annotations-java5")
-    }
 
     implementation(platform(libs.compose.bom))
     implementation(libs.bundles.compose)

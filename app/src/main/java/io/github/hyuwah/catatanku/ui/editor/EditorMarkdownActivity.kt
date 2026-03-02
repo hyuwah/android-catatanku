@@ -1,20 +1,28 @@
 package io.github.hyuwah.catatanku.ui.editor
 
 import android.os.Bundle
-import android.view.MenuItem
+import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.scrollable
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Scaffold
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import dagger.hilt.android.AndroidEntryPoint
-import io.github.hyuwah.catatanku.R
-import io.github.hyuwah.catatanku.databinding.ActivityEditorMarkdownBinding
-import io.github.hyuwah.catatanku.domain.model.Note
-import io.github.hyuwah.catatanku.utils.markdown.MarkwonFactory
+import dev.jeziellago.compose.markdowntext.MarkdownText
+import io.github.hyuwah.catatanku.ui.common.DefaultAppToolBar
+import io.github.hyuwah.catatanku.ui.theme.AppTheme
 
 @AndroidEntryPoint
 class EditorMarkdownActivity : AppCompatActivity() {
-
-    private lateinit var binding: ActivityEditorMarkdownBinding
-
     private val viewModel: EditorViewModel by viewModels()
 
     private val noteId by lazy {
@@ -27,36 +35,38 @@ class EditorMarkdownActivity : AppCompatActivity() {
         intent.getStringExtra("BODY").orEmpty()
     }
 
-    private val markwon by lazy {
-        MarkwonFactory.get(this)
-    }
-
+    @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityEditorMarkdownBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-        setSupportActionBar(binding.toolbar)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white_24)
-
-        viewModel.note.observe(this, ::setupMarkdown)
-
         if (noteId.isNotBlank()) {
             viewModel.getNoteById(noteId)
-        } else {
-            title = legacyTitle.ifBlank { "Untitled" }
-            markwon.setMarkdown(binding.markdownContainer, legacyContent)
         }
-
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.itemId == android.R.id.home) finish()
-        return super.onOptionsItemSelected(item)
-    }
-
-    private fun setupMarkdown(note: Note) {
-        title = note.title
-        markwon.setMarkdown(binding.markdownContainer, note.contentText)
+        setContent {
+            val note by viewModel.note.observeAsState()
+            AppTheme {
+                Scaffold(
+                    topBar = {
+                        DefaultAppToolBar(
+                            text = legacyTitle.ifBlank { note?.title.orEmpty() }.ifBlank { "Untitled" },
+                            onNavClicked = { finish() }
+                        )
+                    }
+                ) { paddingValues ->
+                    Column(
+                        modifier = Modifier
+                            .padding(paddingValues)
+                            .fillMaxSize()
+                            .scrollable(rememberScrollState(), orientation = Orientation.Vertical),
+                    ) {
+                        MarkdownText(
+                            markdown = legacyContent.ifBlank { note?.contentText.orEmpty() },
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(12.dp)
+                        )
+                    }
+                }
+            }
+        }
     }
 }

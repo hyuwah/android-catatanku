@@ -8,6 +8,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import io.github.hyuwah.catatanku.databinding.ActivitySplashBinding
 import io.github.hyuwah.catatanku.ui.notelist.NoteListActivity
+import io.github.hyuwah.catatanku.ui.notelist.NoteListV2Activity
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -21,7 +22,7 @@ class SplashActivity : AppCompatActivity() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.CREATED) {
                 delay(2000)
-                startActivity(Intent(this@SplashActivity, NoteListActivity::class.java))
+                startActivity(Intent(this@SplashActivity, NoteListV2Activity::class.java))
                 finish()
             }
         }

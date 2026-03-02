@@ -23,9 +23,13 @@
             </intent-filter>
         </activity>
         <activity
+            android:name=".ui.notelist.NoteListV2Activity"
+            android:exported="false"
+            />
+        <activity
             android:name=".ui.editor.EditorActivity"
             android:exported="false"
-            android:parentActivityName=".ui.notelist.NoteListActivity" />
+            android:parentActivityName=".ui.notelist.NoteListV2Activity" />
 
         <provider
             android:name=".utils.storage.NoteProvider"

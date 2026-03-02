@@ -1,27 +1,23 @@
 [versions]
-agp = "8.8.2"
-android-about-page = "1.2.4"
+agp = "8.9.1"
 appcompat = "1.7.1"
-activity = "1.10.1"
+activity = "1.12.4"
 browser = "1.8.0"
 constraintlayout = "2.2.1"
-kotlin = "2.1.10"
-core-ktx = "1.16.0"
+kotlin = "2.3.10"
+core-ktx = "1.17.0"
 lifecycle = "2.10.0"
 desugar = "2.1.5"
 coroutines = "1.10.2"
-hilt = "2.56.2"
-ksp = "2.1.10-1.0.31"
+hilt = "2.58"
+ksp = "2.3.5"
 android-multidex = "2.0.1"
 junit = "4.13.2"
 androidx-test-ext-junit = "1.2.1"
 espresso-core = "3.6.1"
 lottie = "6.7.1"
 material = "1.12.0"
-markdownview = "0.19.0"
 room = "2.8.4"
-markwon = "4.6.2"
-prism4j = "2.0.0"
 paging = "3.4.1"
 navigation3 = "1.1.0-alpha05"
 
@@ -41,8 +37,6 @@ hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hilt"
 hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hilt" }
 hilt-compiler = { module = "com.google.dagger:hilt-compiler", version.ref = "hilt" }
 
-kotlin-stdlib-jdk7 = { module = "org.jetbrains.kotlin:kotlin-stdlib-jdk7", version.ref = "kotlin" }
-ksp = { module = "com.google.devtools.ksp:com.google.devtools.ksp.gradle.plugin", version.ref = "ksp" }
 material = { module = "com.google.android.material:material", version.ref = "material" }
 
 coroutine-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
@@ -69,17 +63,8 @@ paging-runtime = { module = "androidx.paging:paging-runtime-ktx", version.ref = 
 paging-compose = { module = "androidx.paging:paging-compose", version.ref = "paging" }
 
 lottie = { module = "com.airbnb.android:lottie", version.ref = "lottie" }
-android-about-page = { module = "com.github.medyo:android-about-page", version.ref = "android-about-page" }
 
-markwon-core = { module = "io.noties.markwon:core", version.ref = "markwon" }
-markwon-editor = { module = "io.noties.markwon:editor", version.ref = "markwon" }
-markwon-strikethrough = { module = "io.noties.markwon:ext-strikethrough", version.ref = "markwon" }
-markwon-tables = { module = "io.noties.markwon:ext-tables", version.ref = "markwon" }
-markwon-tasklist = { module = "io.noties.markwon:ext-tasklist", version.ref = "markwon" }
-markwon-image = { module = "io.noties.markwon:image-coil", version.ref = "markwon" }
-markwon-linkify = { module = "io.noties.markwon:linkify", version.ref = "markwon" }
-markwon-syntaxhighlight = { module = "io.noties.markwon:syntax-highlight", version.ref = "markwon" }
-prism4j-bundler = { module = "io.noties:prism4j-bundler", version.ref = "prism4j" }
+compose-markdown = { module = "com.github.jeziellago:compose-markdown", version = "0.5.8" }
 
 junit = { module = "junit:junit", version.ref = "junit" }
 androidx-test-ext-junit = { module = "androidx.test.ext:junit", version.ref = "androidx-test-ext-junit" }
@@ -95,7 +80,7 @@ compose-material3 = { module = "androidx.compose.material3:material3", version.r
 activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activity" }
 compose-ui-google-font = { module = "androidx.compose.ui:ui-text-google-fonts", version = "1.10.4" }
 compose-coil = { module = "io.coil-kt.coil3:coil-compose", version = "3.4.0" }
-compose-coil-network = { module = "io.coil-kt.coil3:coil-network-okhttp", version = "3.1.0" }
+compose-coil-network = { module = "io.coil-kt.coil3:coil-network-okhttp", version = "3.4.0" }
 compose-livedata = { module = "androidx.compose.runtime:runtime-livedata" }
 compose-hilt-navigation = { module = "androidx.hilt:hilt-navigation-compose", version = "1.3.0" }
 compose-lottie = { module = "com.airbnb.android:lottie-compose", version = "6.7.1" }
@@ -120,7 +105,6 @@ compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "
 coroutines = ["coroutine-core", "coroutine-android"]
 lifecycle = ["lifecycle-viewmodel-ktx", "lifecycle-livedata-ktx", "lifecycle-runtime-ktx", "lifecycle-java8", "lifecycle-viewmodel-nav3"]
 room = ["room-runtime", "room-ktx", "room-paging"]
-markwon = ["markwon-core", "markwon-editor", "markwon-image", "markwon-linkify", "markwon-syntaxhighlight", "markwon-strikethrough", "markwon-tables", "markwon-tasklist"]
 paging = ["paging-runtime"]
 compose = [
     "compose-ui",
@@ -140,6 +124,7 @@ compose = [
     "compose-lottie",
     "compose-material-icons-extended",
     "compose-material-icons-core",
+    "compose-markdown",
 ]
 navigation = [
     "navigation3-runtime",
